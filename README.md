@@ -1,3 +1,15 @@
+# GadgetR
+
+[![Build Status](https://travis-ci.org/REDUS-IMR/gadget.svg?branch=gadgetr)](https://travis-ci.org/REDUS-IMR/gadget) [![Build status](https://ci.appveyor.com/api/projects/status/jabo7nrsu7y1yl50/branch/gadgetr?svg=true)](https://ci.appveyor.com/project/iambaim/gadget/branch/gadgetr)
+
+GadgetR is an R library that provides user with a two-way interface to Hafro's Globally applicable Area Disaggregated General Ecosystem Toolbox (Gadget) program. GadgetR enables user to explicitly control the gadget simulation steps as well as modify and inspect the gadget internal objects (such as recruitment parameters, fleet consumption amount, among others) at any point in time during the simulation.
+GadgetR ships with the latest Gadget program and retains all of the original Gadget program functionality.
+
+## Acknowledgements
+This work is fully supported and is a part of the Norwegian Institute of Marine Research (https://www.hi.no/en) REDUS Project (http://redus.no/).
+
+# Original Gadget README below:
+
 Gadget is the Globally applicable Area Disaggregated General Ecosystem Toolbox.
 
 Welcome to the Gadget development repository. This will eventually contain all the information you ever wanted to know about Gadget, but were afraid to ask. For the time being, however, the information is a bit sparse but we hope that it will grow quickly.
