@@ -1,0 +1,20 @@
+# R Binary
+R_BIN = $(R_HOME)/bin/R
+
+# Various compiler flags
+CXX = `$(R_BIN) CMD config CXX`
+FPIC = `$(R_BIN) CMD config CPICFLAGS`
+
+RCPPFLAGS = `$(R_BIN) CMD config --cppflags`
+RCPPINCL = `$(R_BIN) --vanilla --slave -e 'Rcpp:::CxxFlags()'`
+
+# Source files
+cpp_sources := $(ls *.cpp)
+cpp_sharedlibs := $(.cpp=.o)
+
+all : gadgetr.so
+
+gadgetr.so: $(cpp_sharedlibs)
+
+%.o: %.cpp
+	$(CXX) $< -c $(FPIC) -g -O3 -Wall -march=native $(PKG_CXXFLAGS) -I$(R_INCLUDE_DIR) $(RCPPFLAGS) $(RCPPINCL)

@@ -8,4 +8,4 @@
 
 PKG_CXXFLAGS = -D NDEBUG -I headers/
 
-include Makevars.in
+include Makevars.global
