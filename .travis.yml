@@ -1,0 +1,16 @@
+# R for travis: see documentation at https://docs.travis-ci.com/user/languages/r
+
+warnings_are_errors: false
+
+language: R
+
+matrix:
+  include:
+    - os: linux
+      r: release
+    - os: osx
+      r: release
+
+sudo: false
+
+cache: packages
