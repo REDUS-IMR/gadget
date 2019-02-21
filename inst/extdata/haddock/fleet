@@ -22,7 +22,7 @@ amount          fleet.data      ; where the catch data is stored
 ; Details for the predicted fleet
 ;
 [component]
-linearfleet     future          ; fleet name
+totalfleet      future          ; fleet name
 livesonareas    1               ; areas for the fleet
 multiplicative  #mult           ; scaling factor
 suitability
