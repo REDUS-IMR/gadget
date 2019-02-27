@@ -1,10 +1,13 @@
 library(gadgetr)
 
 # Change working directory to example haddock data
+currDir <- getwd()
 loadExample()
 
 # Load parameters
 gadget(c("-s","-i","refinputfile"))
+
+setwd(currDir)
 
 # Initialize simulation
 initSim()
@@ -25,6 +28,6 @@ print(lengthYear)
 # Sim cleanup
 finalizeSim()
 
-# Get the output
+# Gadget cleanup
 out <- finalize()
 
