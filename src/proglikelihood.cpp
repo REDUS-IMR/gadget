@@ -332,7 +332,7 @@ void ProgLikelihood::CalcTac(const TimeClass* const TimeInfo) {  // can use func
   
   // 2 more triggers+1 harvestratio
   if(triggervalues.Size() == 4) {
-    if(bio2werr[index] > triggervalues[1] & bio2werr[index] < triggervalues[2]) hr = harvestrates[1];
+    if((bio2werr[index] > triggervalues[1]) & (bio2werr[index] < triggervalues[2])) hr = harvestrates[1];
     if((bio2werr[index] >  triggervalues[2]) & (bio2werr[index] < triggervalues[3])) hr = harvestrates[1]+(bio2werr[index]-triggervalues[2])/(triggervalues[3]-triggervalues[2])*(harvestrates[2]-harvestrates[1]);
     if(bio2werr[index] > triggervalues[3]) hr = harvestrates[2];
   }  
