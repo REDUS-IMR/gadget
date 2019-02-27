@@ -186,24 +186,37 @@ Rcpp::IntegerVector finalizeSim(){
         if ((mainGlobal.getPI()).getPrint())
           EcoSystem->writeValues();
    }
-   delete data;
    return Rcpp::IntegerVector(1, 0);
 }
 
 // [[Rcpp::export]]
 Rcpp::List finalize(){
 
-  if (check)
-    free(workingdir);
+  if (workingdir) {
+     delete workingdir;
+     workingdir = 0;
+  }
 
-  delete EcoSystem;
-  EcoSystem = 0;
+  if(EcoSystem) {
+     delete EcoSystem;
+     EcoSystem = 0;
+  }
+
+  if(data) {
+     delete data;
+     data = 0;
+  }
+
+  check = 0;
 
   return Rcpp::List::create(R_NilValue);
 }
 
 // [[Rcpp::export]]
 Rcpp::List gadget(Rcpp::StringVector args) {
+
+  //Ensure to empty everything
+  finalize();
 
   //Get parameter number 
   int aNumber = args.size() + 1;
@@ -376,8 +389,9 @@ Rcpp::List gadget(Rcpp::StringVector args) {
 
 // [[Rcpp::export]]
 Rcpp::LogicalVector isGadgetInitialized(){
-	if(!EcoSystem)
-		return Rcpp::LogicalVector(1, FALSE);
-	else
-		return Rcpp::LogicalVector(1, TRUE);
+  if(!EcoSystem)
+    return Rcpp::LogicalVector(1, FALSE);
+  else
+    return Rcpp::LogicalVector(1, TRUE);
 }
+
