@@ -125,6 +125,68 @@ runYear <- function() {
 }
 
 
+# Run for a step and collect stats for stocks and fleets for that step
+runStep <- function() {
+
+	# Placeholders
+	stats <- list()
+	tmp <- list()
+
+	# Recursive list combining
+	combineStats <- function(x, path) {
+		path <- c(path, names(x))
+		y <- x[[1]]
+		if (class(y) == "list") {
+			for(i in names(y))
+				combineStats(y[i], path)
+		} else {
+			# Embed the matrix
+			# Must use eval and parse
+			eval(parse(text=paste0("xtemp <- tmp", paste0("[[\"", path, "\"]]", collapse=""))))
+			eval(parse(text=paste0("ztemp <- stats", paste0("[[\"", path, "\"]]", collapse=""))))
+
+			#print(paste(paste0("xtemp <- tmp", paste0("[[\"", path, "\"]]", collapse="")), "X rows", nrow(xtemp)))
+			#print(paste(paste0("ztemp <- stats", paste0("[[\"", path, "\"]]", collapse="")), "Z rows", nrow(ztemp)))
+
+			ztemp <- rbind(ztemp, xtemp)
+			#print(paste("comb rows ", nrow(ztemp)))
+			eval(parse(text=paste0("stats", paste0("[[\"", path, "\"]]", collapse="")," <<- ztemp")))
+			#print(paste("aggregated stats ", nrow(eval(parse(text=paste0("stats", paste0("[[\"", path, "\"]]", collapse="")))))))
+		}
+	}
+
+	ecoSystem <- getEcosystemInfo()
+	currentYear <- ecoSystem[["time"]][["currentYear"]]
+	currentYear <- ecoSystem[["time"]][["currentStep"]]
+
+	# Get stats from all stocks (before stepping)
+	stockStatPre <- processStockStats(ecoSystem[["stock"]], pre=TRUE)
+
+	# Run forward a single step
+	status <- stepSim()
+
+	# Get stats from all stocks (after stepping)
+	stockStatPost <- processStockStats(ecoSystem[["stock"]], pre=FALSE)
+
+	# Combine both pre and post
+	stockStat <- lapply(ecoSystem[["stock"]], function(x) return(c(stockStatPre[[x]], stockStatPost[[x]])))
+	names(stockStat) <- ecoSystem[["stock"]]
+
+	# Get stats from all fleets
+	fleetStat <- processFleetStats(ecoSystem[["fleet"]])
+
+	# Make temp list
+	tmp <- list(fleets=fleetStat, stocks=stockStat)
+
+	if(length(stats)==0) stats <- tmp
+	else {
+		combineStats(tmp["fleets"], c())
+		combineStats(tmp["stocks"], c())
+	}
+
+	return(stats)
+}
+
 getFleetNo <- function(fleetName){
 	match(fleetName, getEcosystemInfo()$fleet)
 }
