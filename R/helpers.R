@@ -126,7 +126,7 @@ runYear <- function() {
 
 
 # Run for a step and collect stats for stocks and fleets for that step
-runStep <- function() {
+runStep <- function(stockAfterStep = FALSE) {
 
 	# Placeholders
 	stats <- list()
@@ -159,11 +159,19 @@ runStep <- function() {
 	currentYear <- ecoSystem[["time"]][["currentYear"]]
 	currentYear <- ecoSystem[["time"]][["currentStep"]]
 
-	# Get stats from all stocks (before stepping)
-	stockStatPre <- processStockStats(ecoSystem[["stock"]], pre=TRUE)
+	if(stockAfterStep) {
+		# Run forward a single step
+		status <- stepSim()
 
-	# Run forward a single step
-	status <- stepSim()
+		# Get stats from all stocks (after stepping)
+		stockStatPre <- processStockStats(ecoSystem[["stock"]], pre=TRUE)
+	} else {
+		# Get stats from all stocks (before stepping)
+		stockStatPre <- processStockStats(ecoSystem[["stock"]], pre=TRUE)
+
+		# Run forward a single step
+		status <- stepSim()
+	}
 
 	# Get stats from all stocks (after stepping)
 	stockStatPost <- processStockStats(ecoSystem[["stock"]], pre=FALSE)
