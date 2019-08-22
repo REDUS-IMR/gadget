@@ -191,10 +191,11 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
    TimeClass* TimeInfo = EcoSystem->getTimeInfo();
 
    AreaClass* Area = EcoSystem->getArea();
-   IntVector areas = Area->getAllModelAreas();
 
    StockPtrVector stockvec = EcoSystem->getModelStockVector();
    Stock *stock = stockvec[stockNo[0]-1];
+
+   IntVector areas = stock->getAreas();
 
    PopPredator *predator = NULL;
 
@@ -234,8 +235,7 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
      Rcpp::Rcout << "Error in predatorpreyaggregator - cannot aggregate prey" << prey->getName() << std::endl;
 
    for (j = 0; j < areas.Size(); j++){
-      int area = Area->getInnerArea(areas[j]);
-      alptr = &prey->getConsumptionALK(area);
+      alptr = &prey->getConsumptionALK(areas[j]);
       mortality.resize(new DoubleMatrix(alptr->Nrow(), prey->getLengthGroupDiv()->numLengthGroups(), 0.0));
    }
 
@@ -256,15 +256,14 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
    //First calculate the prey population that is consumed by the predation
    if (predator->doesEat(prey->getName())) {
           for (j = 0; j < areas.Size(); j++) {
-            int area = Area->getInnerArea(areas[j]);
-            if ((prey->isPreyArea(area)) && (predator->isInArea(area))) {
+            if ((prey->isPreyArea(areas[j])) && (predator->isInArea(areas[j]))) {
               for (k = 0; k < predator->numPreys(); k++) {
                 if (strcasecmp(prey->getName(), predator->getPrey(k)->getName()) == 0) {
-                  alptr = &prey->getConsumptionALK(area);
+                  alptr = &prey->getConsumptionALK(areas[j]);
                   for (h = 0; h < predator->getLengthGroupDiv()->numLengthGroups(); h++) {
                     //suitptr = &predator->getSuitability(k)[h];
-                    suitptr = &predator->getUseSuitability(area, k)[h];
-                    ratio = predator->getConsumptionRatio(area, k, h);
+                    suitptr = &predator->getUseSuitability(areas[j], k)[h];
+                    ratio = predator->getConsumptionRatio(areas[j], k, h);
                     for (l = 0; l < alptr->Nrow(); l++){
                           int age = alptr->minAge() + l;
                           consume[j][l].Add((*alptr)[age], *CI, *suitptr, ratio);
@@ -278,9 +277,8 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
 
   //Then calculate the prey population before predation
   for (j = 0; j < areas.Size(); j++) {
-        int area = Area->getInnerArea(areas[j]);
-        if (prey->isPreyArea(area)) {
-          alptr = &prey->getConsumptionALK(area);
+        if (prey->isPreyArea(areas[j])) {
+          alptr = &prey->getConsumptionALK(areas[j]);
           for (l = 0; l < alptr->Nrow(); l++){
                 int age = alptr->minAge() + l;
                 total[j][l].Add((*alptr)[age], *CI);
@@ -305,42 +303,42 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
   int precision = 4;
 #endif
 
-  int a, age, len;
+  int age, len;
 
   Rcpp::DataFrame df;
 
-  for (a = 0; a < areas.Size(); a++) {
-    for (age = consume[a].minAge(); age <= consume[a].maxAge(); age++) {
-      for (len = consume[a].minLength(age); len < consume[a].maxLength(age); len++) {
+  for (j = 0; j < areas.Size(); j++) {
+    for (age = consume[areas[j]].minAge(); age <= consume[areas[j]].maxAge(); age++) {
+      for (len = consume[areas[j]].minLength(age); len < consume[areas[j]].maxLength(age); len++) {
 #ifdef DEBUG
         Rcpp::Rcout << setw(lowwidth) << TimeInfo->getPrevYear() << sep
           << setw(lowwidth) << TimeInfo->getPrevStep() << sep
-          << setw(printwidth) << Area->getModelArea(a) << sep
+          << setw(printwidth) << Area->getModelArea(areas[j]) << sep
           << setw(printwidth) << stock->minAge() + age << sep
           << setw(printwidth) << prey->getLengthGroupDiv()->minLength(len) << sep;
 #endif
         Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-            TimeInfo->getPrevStep(), Area->getModelArea(a), stock->minAge() + age,
+            TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), stock->minAge() + age,
             prey->getLengthGroupDiv()->minLength(len) );
 
         Rcpp::NumericVector w;
         // JMB crude filter to remove the 'silly' values from the output
-        if ((consume[a][age][len].N < rathersmall) || (consume[a][age][len].W < 0.0)){
+        if ((consume[areas[j]][age][len].N < rathersmall) || (consume[areas[j]][age][len].W < 0.0)){
 #ifdef DEBUG
           Rcpp::Rcout << setw(width) << 0 << sep << setw(width) << 0 << sep << setw(width) << 0 << endl;
 #endif
           w = Rcpp::NumericVector::create(0, 0, 0);
         }else{
 #ifdef DEBUG
-          Rcpp::Rcout << setprecision(precision) << setw(width) << consume[a][age][len].N
+          Rcpp::Rcout << setprecision(precision) << setw(width) << consume[areas[j]][age][len].N
             << sep << setprecision(precision) << setw(width)
-            << consume[a][age][len].N * consume[a][age][len].W
+            << consume[areas[j]][age][len].N * consume[areas[j]][age][len].W
             << sep << setprecision(precision) << setw(width)
-            << (*mortality[a])[age][len] << endl;
+            << (*mortality[areas[j]])[age][len] << endl;
 #endif
-          w = Rcpp::NumericVector::create(consume[a][age][len].N,
-            consume[a][age][len].N * consume[a][age][len].W,
-            (*mortality[a])[age][len]);
+          w = Rcpp::NumericVector::create(consume[areas[j]][age][len].N,
+            consume[areas[j]][age][len].N * consume[areas[j]][age][len].W,
+            (*mortality[areas[j]])[age][len]);
         }
 
         // Do: z <- c(v,w)
@@ -383,10 +381,11 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
    TimeClass* TimeInfo = EcoSystem->getTimeInfo();
 
    AreaClass* Area = EcoSystem->getArea();
-   IntVector areas = Area->getAllModelAreas();
 
    StockPtrVector stockvec = EcoSystem->getModelStockVector();
    Stock *stock = stockvec[stockNo[0]-1];
+
+   IntVector areas = stock->getAreas();
 
 #ifdef DEBUG
    int width = 0;
@@ -397,19 +396,18 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
    Rcpp::DataFrame df;
 
    for (j = 0; j < areas.Size(); j++) {
-     int a = Area->getInnerArea(areas[j]);
-     alptr = &stock->getCurrentALK(a);
+     alptr = &stock->getCurrentALK(areas[j]);
      for (age = alptr->minAge(); age <= alptr->maxAge(); age++) {
        for (len = alptr->minLength(age); len < alptr->maxLength(age); len++) {
 #ifdef DEBUG
          Rcpp::Rcout << setw(lowwidth) << TimeInfo->getYear() << sep
            << setw(lowwidth) << TimeInfo->getStep() << sep
-           << setw(lowwidth) << Area->getModelArea(a) << sep << setw(lowwidth)
+           << setw(lowwidth) << Area->getModelArea(areas[j]) << sep << setw(lowwidth)
            << age  << sep << setw(lowwidth)
            << stock->getLengthGroupDiv()->minLength(len) << sep;
 #endif
          Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getYear(),
-            TimeInfo->getStep(), Area->getModelArea(a), age,
+            TimeInfo->getStep(), Area->getModelArea(areas[j]), age,
             stock->getLengthGroupDiv()->minLength(len));
          Rcpp::NumericVector w;
 
@@ -467,10 +465,11 @@ Rcpp::NumericMatrix printDetailedSSB(Rcpp::IntegerVector stockNo){
    TimeClass* TimeInfo = EcoSystem->getTimeInfo();
 
    AreaClass* Area = EcoSystem->getArea();
-   IntVector areas = Area->getAllModelAreas();
 
    StockPtrVector stockvec = EcoSystem->getModelStockVector();
    Stock *stock = stockvec[stockNo[0]-1];
+
+   IntVector areas = stock->getAreas();
 
    if(!stock->getSpawnData()){
 	   Rcpp::NumericMatrix m(0,0);
@@ -488,32 +487,31 @@ Rcpp::NumericMatrix printDetailedSSB(Rcpp::IntegerVector stockNo){
    Rcpp::DataFrame df;
 
    for (j = 0; j < areas.Size(); j++) {
-     int a = Area->getInnerArea(areas[j]);
-     alptr = &stock->getCurrentALK(a);
+     alptr = &stock->getCurrentALK(areas[j]);
      for (age = alptr->minAge(); age <= alptr->maxAge(); age++) {
        for (len = alptr->minLength(age); len < alptr->maxLength(age); len++) {
 #ifdef DEBUG
          Rcpp::Rcout << setw(lowwidth) << TimeInfo->getPrevYear() << sep
            << setw(lowwidth) << TimeInfo->getPrevStep() << sep
-           << setw(lowwidth) << Area->getModelArea(a) << sep << setw(lowwidth)
+           << setw(lowwidth) << Area->getModelArea(areas[j]) << sep << setw(lowwidth)
            << age << sep << setw(lowwidth)
            << stock->getLengthGroupDiv()->minLength(len) << sep;
 #endif
          Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-            TimeInfo->getPrevStep(), Area->getModelArea(a), age,
+            TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), age,
             stock->getLengthGroupDiv()->minLength(len));
          Rcpp::NumericVector w;
 
-         if (((*(*spawnNumbers)[a])[age][len]  < rathersmall) || ((*(*spawnNumbers)[a])[age][len]< 0.0)){
+         if (((*(*spawnNumbers)[areas[j]])[age][len]  < rathersmall) || ((*(*spawnNumbers)[areas[j]])[age][len]< 0.0)){
 #ifdef DEBUG
            Rcpp::Rcout << setw(width) << 0 << endl;
 #endif
            w = Rcpp::NumericVector::create(0);
          }else{
 #ifdef DEBUG
-           Rcpp::Rcout << setprecision(precision) << setw(width) <<  (*(*spawnNumbers)[a])[age][len] << endl;
+           Rcpp::Rcout << setprecision(precision) << setw(width) <<  (*(*spawnNumbers)[areas[j]])[age][len] << endl;
 #endif
-           w = Rcpp::NumericVector::create((*(*spawnNumbers)[a])[age][len]);
+           w = Rcpp::NumericVector::create((*(*spawnNumbers)[areas[j]])[age][len]);
          }
 
          // Do: z <- c(v,w)
@@ -553,10 +551,11 @@ Rcpp::IntegerVector updateRecruitmentC(Rcpp::IntegerVector stockNo, Rcpp::Numeri
    int functionnumber, paramsize;
 
    AreaClass* Area = EcoSystem->getArea();
-   IntVector areas = Area->getAllModelAreas();
 
    StockPtrVector stockvec = EcoSystem->getModelStockVector();
    Stock *stock = stockvec[stockNo[0]-1];
+
+   IntVector areas = stock->getAreas();
 
    if(!stock->getSpawnData()){
 	   return Rcpp::IntegerVector(1,55);
@@ -622,10 +621,11 @@ Rcpp::NumericMatrix printSSB(Rcpp::IntegerVector stockNo){
    TimeClass* TimeInfo = EcoSystem->getTimeInfo();
 
    AreaClass* Area = EcoSystem->getArea();
-   IntVector areas = Area->getAllModelAreas();
 
    StockPtrVector stockvec = EcoSystem->getModelStockVector();
    Stock *stock = stockvec[stockNo[0]-1];
+
+   IntVector areas = stock->getAreas();
 
    SpawnData* spawner = stock->getSpawnData();
    if(!spawner){
@@ -636,14 +636,13 @@ Rcpp::NumericMatrix printSSB(Rcpp::IntegerVector stockNo){
    Rcpp::DataFrame df;
 
    for (j = 0; j < areas.Size(); j++) {
-      int a = Area->getInnerArea(areas[j]);
       Rcpp::NumericVector v;
-      if(spawner->isSpawnStepAreaPrev(a, TimeInfo)){
+      if(spawner->isSpawnStepAreaPrev(areas[j], TimeInfo)){
           v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-            TimeInfo->getPrevStep(), Area->getModelArea(a), spawner->getSSB()[a]);
+            TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), spawner->getSSB()[areas[j]]);
       }else{
           v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-            TimeInfo->getPrevStep(), Area->getModelArea(a), 0.0);
+            TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), 0.0);
       }
       // Append at the end of the DataFrame
       df.insert(df.end(), v);
@@ -675,10 +674,11 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
    TimeClass* TimeInfo = EcoSystem->getTimeInfo();
 
    AreaClass* Area = EcoSystem->getArea();
-   IntVector areas = Area->getAllModelAreas();
 
    StockPtrVector stockvec = EcoSystem->getModelStockVector();
    Stock *stock = stockvec[stockNo[0]-1];
+
+   IntVector areas = stock->getAreas();
 
    Rcpp::DataFrame dfRec, dfRen;
    Rcpp::NumericMatrix matRec, matRen;
@@ -695,14 +695,13 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
 
    if(spawner){
       for (j = 0; j < areas.Size(); j++) {
-         int a = Area->getInnerArea(areas[j]);
          Rcpp::NumericVector v;
-         if(spawner->isSpawnStepAreaPrev(a, TimeInfo)){
+         if(spawner->isSpawnStepAreaPrev(areas[j], TimeInfo)){
             v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-               TimeInfo->getPrevStep(), Area->getModelArea(a), spawner->getRec()[a]);
+               TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), spawner->getRec()[areas[j]]);
          }else{
             v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-               TimeInfo->getPrevStep(), Area->getModelArea(a), 0.0);
+               TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), 0.0);
          }
          // Append at the end of the DataFrame
          dfRec.insert(dfRec.end(), v);
@@ -726,20 +725,19 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
 
    if(renewal){
       for (j = 0; j < areas.Size(); j++) {
-         int a = Area->getInnerArea(areas[j]);
          Rcpp::NumericVector v;
-	 if(renewal->isRenewalPrevStepArea(a, TimeInfo)){
-	    Rcpp::List renewalInfo = stock->getCurrentALK(a).getRenewalInfo();
+	 if(renewal->isRenewalPrevStepArea(areas[j], TimeInfo)){
+	    Rcpp::List renewalInfo = stock->getCurrentALK(areas[j]).getRenewalInfo();
             for(int ll = 0; ll < renewalInfo.length(); ll++){
                Rcpp::NumericVector tmp = renewalInfo[ll];
                v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-                  TimeInfo->getPrevStep(), Area->getModelArea(a), tmp[0],
+                  TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), tmp[0],
                   stock->getLengthGroupDiv()->minLength(tmp[1]), tmp[2], tmp[3]);
                dfRen.insert(dfRen.end(), v);
             }
          }else{
                v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-                  TimeInfo->getPrevStep(), Area->getModelArea(a), 0, 0, 0, 0);
+                  TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), 0, 0, 0, 0);
                dfRen.insert(dfRen.end(), v);
          }
       }
