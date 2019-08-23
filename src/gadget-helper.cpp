@@ -305,7 +305,7 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
 
   int age, len;
 
-  Rcpp::DataFrame df;
+  std::vector<Rcpp::NumericVector> df;
 
   for (j = 0; j < areas.Size(); j++) {
     for (age = consume[areas[j]].minAge(); age <= consume[areas[j]].maxAge(); age++) {
@@ -319,15 +319,14 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
 #endif
         Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
             TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), stock->minAge() + age,
-            prey->getLengthGroupDiv()->minLength(len) );
+            prey->getLengthGroupDiv()->minLength(len), 0, 0, 0 );
 
-        Rcpp::NumericVector w;
         // JMB crude filter to remove the 'silly' values from the output
         if ((consume[areas[j]][age][len].N < rathersmall) || (consume[areas[j]][age][len].W < 0.0)){
 #ifdef DEBUG
           Rcpp::Rcout << setw(width) << 0 << sep << setw(width) << 0 << sep << setw(width) << 0 << endl;
 #endif
-          w = Rcpp::NumericVector::create(0, 0, 0);
+          v[5] = v[6] = v[7] = 0;
         }else{
 #ifdef DEBUG
           Rcpp::Rcout << setprecision(precision) << setw(width) << consume[areas[j]][age][len].N
@@ -336,19 +335,13 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
             << sep << setprecision(precision) << setw(width)
             << (*mortality[areas[j]])[age][len] << endl;
 #endif
-          w = Rcpp::NumericVector::create(consume[areas[j]][age][len].N,
-            consume[areas[j]][age][len].N * consume[areas[j]][age][len].W,
-            (*mortality[areas[j]])[age][len]);
+          v[5] = consume[areas[j]][age][len].N;
+          v[6] = consume[areas[j]][age][len].N * consume[areas[j]][age][len].W;
+          v[7] = (*mortality[areas[j]])[age][len];
         }
 
-        // Do: z <- c(v,w)
-        Rcpp::NumericVector z(v.size() + w.size());
-
-        std::copy(v.begin(), v.end(), z.begin());
-        std::copy(w.begin(), w.end(), z.begin() + v.size());
-
         // Append at the end of the DataFrame
-        df.insert(df.end(), z);
+        df.push_back(v);
       }
     }
   }
@@ -361,7 +354,7 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
   int dfsize = df.size();
   Rcpp::NumericMatrix mattemp(8, dfsize);
   for ( i = 0; i < dfsize; i++ ) {
-      mattemp(Rcpp::_, i) = Rcpp::NumericVector(df[i]);
+      mattemp(Rcpp::_, i) = df[i];
   }
 
   Rcpp::rownames(mattemp) = namevec;
@@ -393,7 +386,7 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
    int precision = 4;
 #endif
 
-   Rcpp::DataFrame df;
+   std::vector<Rcpp::NumericVector> df;
 
    for (j = 0; j < areas.Size(); j++) {
      alptr = &stock->getCurrentALK(areas[j]);
@@ -408,31 +401,25 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
 #endif
          Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getYear(),
             TimeInfo->getStep(), Area->getModelArea(areas[j]), age,
-            stock->getLengthGroupDiv()->minLength(len));
-         Rcpp::NumericVector w;
+            stock->getLengthGroupDiv()->minLength(len), 0, 0);
 
          //JMB crude filter to remove the 'silly' values from the output
          if (((*alptr)[age][len].N < rathersmall) || ((*alptr)[age][len].W < 0.0)){
 #ifdef DEBUG
            Rcpp::Rcout << setw(width) << 0 << sep << setw(width) << 0 << endl;
 #endif
-           w = Rcpp::NumericVector::create(0, 0);
+           v[5] = v[6] = 0;
          }else{
 #ifdef DEBUG
            Rcpp::Rcout << setprecision(precision) << setw(width) << (*alptr)[age][len].N << sep
              << setprecision(precision) << setw(width) << (*alptr)[age][len].W << endl;
 #endif
-           w = Rcpp::NumericVector::create((*alptr)[age][len].N, (*alptr)[age][len].W);
+           v[5] = (*alptr)[age][len].N;
+           v[6] = (*alptr)[age][len].W;
          }
 
-         // Do: z <- c(v,w)
-         Rcpp::NumericVector z(v.size() + w.size());
-
-         std::copy(v.begin(), v.end(), z.begin());
-         std::copy(w.begin(), w.end(), z.begin() + v.size());
-
-         // Append at the end of the DataFrame
-         df.insert(df.end(), z);
+         // Append at the end of the vector
+         df.push_back(v);
        }
      }
   }
@@ -445,7 +432,7 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
   int dfsize = df.size();
   Rcpp::NumericMatrix mattemp(7, dfsize);
   for ( j = 0; j < dfsize; j++ ) {
-      mattemp(Rcpp::_, j) = Rcpp::NumericVector(df[j]);
+      mattemp(Rcpp::_, j) = df[j];
   }
 
   Rcpp::rownames(mattemp) = namevec;
@@ -484,7 +471,7 @@ Rcpp::NumericMatrix printDetailedSSB(Rcpp::IntegerVector stockNo){
    int precision = 4;
 #endif
 
-   Rcpp::DataFrame df;
+   std::vector<Rcpp::NumericVector> df;
 
    for (j = 0; j < areas.Size(); j++) {
      alptr = &stock->getCurrentALK(areas[j]);
@@ -499,29 +486,22 @@ Rcpp::NumericMatrix printDetailedSSB(Rcpp::IntegerVector stockNo){
 #endif
          Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
             TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), age,
-            stock->getLengthGroupDiv()->minLength(len));
-         Rcpp::NumericVector w;
+            stock->getLengthGroupDiv()->minLength(len), 0);
 
          if (((*(*spawnNumbers)[areas[j]])[age][len]  < rathersmall) || ((*(*spawnNumbers)[areas[j]])[age][len]< 0.0)){
 #ifdef DEBUG
            Rcpp::Rcout << setw(width) << 0 << endl;
 #endif
-           w = Rcpp::NumericVector::create(0);
+           v[5] = 0;
          }else{
 #ifdef DEBUG
            Rcpp::Rcout << setprecision(precision) << setw(width) <<  (*(*spawnNumbers)[areas[j]])[age][len] << endl;
 #endif
-           w = Rcpp::NumericVector::create((*(*spawnNumbers)[areas[j]])[age][len]);
+           v[5] = (*(*spawnNumbers)[areas[j]])[age][len];
          }
 
-         // Do: z <- c(v,w)
-         Rcpp::NumericVector z(v.size() + w.size());
-
-         std::copy(v.begin(), v.end(), z.begin());
-         std::copy(w.begin(), w.end(), z.begin() + v.size());
-
          // Append at the end of the DataFrame
-         df.insert(df.end(), z);
+         df.push_back(v);
        }
      }
   }
@@ -534,7 +514,7 @@ Rcpp::NumericMatrix printDetailedSSB(Rcpp::IntegerVector stockNo){
   int dfsize = df.size();
   Rcpp::NumericMatrix mattemp(6, dfsize);
   for ( j = 0; j < dfsize; j++ ) {
-      mattemp(Rcpp::_, j) = Rcpp::NumericVector(df[j]);
+      mattemp(Rcpp::_, j) = df[j];
   }
 
   Rcpp::rownames(mattemp) = namevec;
@@ -633,7 +613,7 @@ Rcpp::NumericMatrix printSSB(Rcpp::IntegerVector stockNo){
 	   return m;
    }
 
-   Rcpp::DataFrame df;
+   std::vector<Rcpp::NumericVector> df;
 
    for (j = 0; j < areas.Size(); j++) {
       Rcpp::NumericVector v;
@@ -645,7 +625,7 @@ Rcpp::NumericMatrix printSSB(Rcpp::IntegerVector stockNo){
             TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), 0.0);
       }
       // Append at the end of the DataFrame
-      df.insert(df.end(), v);
+      df.push_back(v);
    }
 
    // Give names to the columns
@@ -656,7 +636,7 @@ Rcpp::NumericMatrix printSSB(Rcpp::IntegerVector stockNo){
    int dfsize = df.size();
    Rcpp::NumericMatrix mattemp(4, dfsize);
    for ( j = 0; j < dfsize; j++ ) {
-      mattemp(Rcpp::_, j) = Rcpp::NumericVector(df[j]);
+      mattemp(Rcpp::_, j) = df[j];
    }
 
    Rcpp::rownames(mattemp) = namevec;
@@ -680,7 +660,7 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
 
    IntVector areas = stock->getAreas();
 
-   Rcpp::DataFrame dfRec, dfRen;
+   std::vector<Rcpp::NumericVector> dfRec, dfRen;
    Rcpp::NumericMatrix matRec, matRen;
 
    // Get from Spawner and Renewal
@@ -704,7 +684,7 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
                TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), 0.0);
          }
          // Append at the end of the DataFrame
-         dfRec.insert(dfRec.end(), v);
+         dfRec.push_back(v);
       }
 
       // Give names to the columns
@@ -715,7 +695,7 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
       int dfsize = dfRec.size();
       Rcpp::NumericMatrix mattemp(4, dfsize);
       for ( j = 0; j < dfsize; j++ ) {
-         mattemp(Rcpp::_, j) = Rcpp::NumericVector(dfRec[j]);
+         mattemp(Rcpp::_, j) = dfRec[j];
       }
 
       Rcpp::rownames(mattemp) = namevec;
@@ -733,12 +713,12 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
                v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
                   TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), tmp[0],
                   stock->getLengthGroupDiv()->minLength(tmp[1]), tmp[2], tmp[3]);
-               dfRen.insert(dfRen.end(), v);
+               dfRen.push_back(v);
             }
          }else{
                v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
                   TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), 0, 0, 0, 0);
-               dfRen.insert(dfRen.end(), v);
+               dfRen.push_back(v);
          }
       }
       // Give names to the columns
@@ -749,7 +729,7 @@ Rcpp::List printRecruitment(Rcpp::IntegerVector stockNo){
       int dfsize = dfRen.size();
       Rcpp::NumericMatrix mattemp(7, dfsize);
       for ( j = 0; j < dfsize; j++ ) {
-         mattemp(Rcpp::_, j) = Rcpp::NumericVector(dfRen[j]);
+         mattemp(Rcpp::_, j) = dfRen[j];
       }
 
       Rcpp::rownames(mattemp) = namevec;
