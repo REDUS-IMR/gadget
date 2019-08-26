@@ -305,8 +305,17 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
 
   int age, len;
 
-  std::vector<Rcpp::NumericVector> df;
+  // Pre-allocate
+  int dfsize = 0;
+  for (j = 0; j < areas.Size(); j++)
+    for (age = consume[areas[j]].minAge(); age <= consume[areas[j]].maxAge(); age++)
+      for (len = consume[areas[j]].minLength(age); len < consume[areas[j]].maxLength(age); len++)
+        dfsize++;
 
+  Rcpp::NumericMatrix mattemp(dfsize, 8);
+
+  // Fill in matrix
+  dfsize = 0;
   for (j = 0; j < areas.Size(); j++) {
     for (age = consume[areas[j]].minAge(); age <= consume[areas[j]].maxAge(); age++) {
       for (len = consume[areas[j]].minLength(age); len < consume[areas[j]].maxLength(age); len++) {
@@ -317,16 +326,18 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
           << setw(printwidth) << stock->minAge() + age << sep
           << setw(printwidth) << prey->getLengthGroupDiv()->minLength(len) << sep;
 #endif
-        Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getPrevYear(),
-            TimeInfo->getPrevStep(), Area->getModelArea(areas[j]), stock->minAge() + age,
-            prey->getLengthGroupDiv()->minLength(len), 0, 0, 0 );
+        mattemp(dfsize, 0) = TimeInfo->getPrevYear();
+        mattemp(dfsize, 1) = TimeInfo->getPrevStep();
+        mattemp(dfsize, 2) = Area->getModelArea(areas[j]);
+        mattemp(dfsize, 3) = stock->minAge() + age;
+        mattemp(dfsize, 4) = prey->getLengthGroupDiv()->minLength(len);
 
         // JMB crude filter to remove the 'silly' values from the output
         if ((consume[areas[j]][age][len].N < rathersmall) || (consume[areas[j]][age][len].W < 0.0)){
 #ifdef DEBUG
           Rcpp::Rcout << setw(width) << 0 << sep << setw(width) << 0 << sep << setw(width) << 0 << endl;
 #endif
-          v[5] = v[6] = v[7] = 0;
+          mattemp(dfsize, 5) = mattemp(dfsize, 6) = mattemp(dfsize, 7) = 0;
         }else{
 #ifdef DEBUG
           Rcpp::Rcout << setprecision(precision) << setw(width) << consume[areas[j]][age][len].N
@@ -335,13 +346,13 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
             << sep << setprecision(precision) << setw(width)
             << (*mortality[areas[j]])[age][len] << endl;
 #endif
-          v[5] = consume[areas[j]][age][len].N;
-          v[6] = consume[areas[j]][age][len].N * consume[areas[j]][age][len].W;
-          v[7] = (*mortality[areas[j]])[age][len];
+          mattemp(dfsize, 5) = consume[areas[j]][age][len].N;
+          mattemp(dfsize, 6) = consume[areas[j]][age][len].N * consume[areas[j]][age][len].W;
+          mattemp(dfsize, 7) = (*mortality[areas[j]])[age][len];
         }
 
-        // Append at the end of the DataFrame
-        df.push_back(v);
+        // Increment row
+        dfsize++;
       }
     }
   }
@@ -350,18 +361,9 @@ Rcpp::NumericMatrix printPredatorPrey(Rcpp::IntegerVector predatorNo, Rcpp::Inte
   Rcpp::CharacterVector namevec = Rcpp::CharacterVector::create("year", "step",
      "area", "age", "length", "numberConsumed", "biomassConsumed", "mortality");
 
-  // Convert to matrix so that we can transpose it (nrows = 8)
-  int dfsize = df.size();
-  Rcpp::NumericMatrix mattemp(8, dfsize);
-  for ( i = 0; i < dfsize; i++ ) {
-      mattemp(Rcpp::_, i) = df[i];
-  }
+  Rcpp::colnames(mattemp) = namevec;
 
-  Rcpp::rownames(mattemp) = namevec;
-
-  Rcpp::NumericMatrix mout = Rcpp::transpose(mattemp);
-
-  return mout;
+  return mattemp;
 }
 
 // [[Rcpp::export]]
@@ -386,8 +388,21 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
    int precision = 4;
 #endif
 
-   std::vector<Rcpp::NumericVector> df;
+   // Pre-alloc
+   int dfsize = 0;
+   for (j = 0; j < areas.Size(); j++) {
+     alptr = &stock->getCurrentALK(areas[j]);
+     for (age = alptr->minAge(); age <= alptr->maxAge(); age++) {
+       for (len = alptr->minLength(age); len < alptr->maxLength(age); len++) {
+         dfsize++;
+       }
+     }
+   }
 
+   Rcpp::NumericMatrix mattemp(dfsize, 7);
+
+   // Fill in values
+   dfsize = 0;
    for (j = 0; j < areas.Size(); j++) {
      alptr = &stock->getCurrentALK(areas[j]);
      for (age = alptr->minAge(); age <= alptr->maxAge(); age++) {
@@ -399,27 +414,29 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
            << age  << sep << setw(lowwidth)
            << stock->getLengthGroupDiv()->minLength(len) << sep;
 #endif
-         Rcpp::NumericVector v = Rcpp::NumericVector::create(TimeInfo->getYear(),
-            TimeInfo->getStep(), Area->getModelArea(areas[j]), age,
-            stock->getLengthGroupDiv()->minLength(len), 0, 0);
+         mattemp(dfsize, 0) = TimeInfo->getYear();
+         mattemp(dfsize, 1) = TimeInfo->getStep();
+         mattemp(dfsize, 2) = Area->getModelArea(areas[j]);
+         mattemp(dfsize, 3) = age;
+         mattemp(dfsize, 4) = stock->getLengthGroupDiv()->minLength(len);
 
          //JMB crude filter to remove the 'silly' values from the output
          if (((*alptr)[age][len].N < rathersmall) || ((*alptr)[age][len].W < 0.0)){
 #ifdef DEBUG
            Rcpp::Rcout << setw(width) << 0 << sep << setw(width) << 0 << endl;
 #endif
-           v[5] = v[6] = 0;
+           mattemp(dfsize, 5) = mattemp(dfsize, 6) = 0;
          }else{
 #ifdef DEBUG
            Rcpp::Rcout << setprecision(precision) << setw(width) << (*alptr)[age][len].N << sep
              << setprecision(precision) << setw(width) << (*alptr)[age][len].W << endl;
 #endif
-           v[5] = (*alptr)[age][len].N;
-           v[6] = (*alptr)[age][len].W;
+           mattemp(dfsize, 5) = (*alptr)[age][len].N;
+           mattemp(dfsize, 6) = (*alptr)[age][len].W;
          }
 
-         // Append at the end of the vector
-         df.push_back(v);
+         // Increment row
+         dfsize++;
        }
      }
   }
@@ -428,18 +445,9 @@ Rcpp::NumericMatrix printStock(Rcpp::IntegerVector stockNo){
   Rcpp::CharacterVector namevec = Rcpp::CharacterVector::create("year", "step",
      "area", "age", "length", "number", "meanWeights");
 
-  // Convert to matrix so that we can transpose it (nrows = 7)
-  int dfsize = df.size();
-  Rcpp::NumericMatrix mattemp(7, dfsize);
-  for ( j = 0; j < dfsize; j++ ) {
-      mattemp(Rcpp::_, j) = df[j];
-  }
+  Rcpp::colnames(mattemp) = namevec;
 
-  Rcpp::rownames(mattemp) = namevec;
-
-  Rcpp::NumericMatrix mout = Rcpp::transpose(mattemp);
-
-  return mout;
+  return mattemp;
 }
 
 // [[Rcpp::export]]
