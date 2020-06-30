@@ -17,4 +17,4 @@ all : gadgetr.so
 gadgetr.so: $(cpp_sharedlibs)
 
 %.o: %.cpp
-	$(CXX) $< -c $(FPIC) -g -O3 -Wall -march=native $(PKG_CXXFLAGS) -I$(R_INCLUDE_DIR) $(RCPPFLAGS) $(RCPPINCL)
+	$(CXX) $< -c $(FPIC) -g -O3 -Wall $(PKG_CXXFLAGS) -I$(R_INCLUDE_DIR) $(RCPPFLAGS) $(RCPPINCL)
