@@ -18,7 +18,7 @@ SummaryPrinter::SummaryPrinter(CommentStream& infile)
   filename = new char[MaxStrLength];
   strncpy(filename, "", MaxStrLength);
   readWordAndValue(infile, "printfile", filename);
-  outfile.open(filename, ios::out);
+  outfile.open(filename, ios::binary);
   handle.checkIfFailure(outfile, filename);
 
   outfile << "; ";

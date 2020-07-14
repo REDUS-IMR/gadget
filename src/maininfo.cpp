@@ -109,7 +109,7 @@ void MainInfo::read(int aNumber, char* const aVector[]) {
       if (k == aNumber - 1)
         this->showCorrectUsage(aVector[k]);
       k++;
-      infile.open(aVector[k], ios::in);
+      infile.open(aVector[k], ios::binary);
       handle.checkIfFailure(infile, aVector[k]);
       if (infile.fail())
         this->showCorrectUsage(aVector[k]);
@@ -278,13 +278,13 @@ void MainInfo::checkUsage(const char* const inputdir, const char* const workingd
     if (strcasecmp(strInitialParamFile, printinfo.getParamOutFile()) == 0)
       handle.logFileMessage(LOGFAIL, "the parameter input and output filenames are the same");
 
-    tmpin.open(strInitialParamFile, ios::in);
+    tmpin.open(strInitialParamFile, ios::binary);
     handle.checkIfFailure(tmpin, strInitialParamFile);
     tmpin.close();
     tmpin.clear();
   }
   if (givenOptInfo) {
-    tmpin.open(strOptInfoFile, ios::in);
+    tmpin.open(strOptInfoFile, ios::binary);
     handle.checkIfFailure(tmpin, strOptInfoFile);
     tmpin.close();
     tmpin.clear();
@@ -293,13 +293,13 @@ void MainInfo::checkUsage(const char* const inputdir, const char* const workingd
   if (chdir(workingdir) != 0)
     handle.logMessage(LOGFAIL, "Error - failed to change working directory to", workingdir);
   if (printInitialInfo) {
-    tmpout.open(strPrintInitialFile, ios::out);
+    tmpout.open(strPrintInitialFile, ios::binary);
     handle.checkIfFailure(tmpout, strPrintInitialFile);
     tmpout.close();
     tmpout.clear();
   }
   if (printFinalInfo) {
-    tmpout.open(strPrintFinalFile, ios::out);
+    tmpout.open(strPrintFinalFile, ios::binary);
     handle.checkIfFailure(tmpout, strPrintFinalFile);
     tmpout.close();
     tmpout.clear();

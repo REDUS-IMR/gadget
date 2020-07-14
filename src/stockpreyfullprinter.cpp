@@ -42,7 +42,7 @@ StockPreyFullPrinter::StockPreyFullPrinter(CommentStream& infile, const TimeClas
     handle.logFileUnexpected(LOGFAIL, "printfile", text);
   infile >> filename >> ws;
 
-  outfile.open(filename, ios::out);
+  outfile.open(filename, ios::binary);
   handle.checkIfFailure(outfile, filename);
 
   infile >> text >> ws;

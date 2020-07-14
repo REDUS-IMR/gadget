@@ -75,13 +75,13 @@ void PrintInfo::checkPrintInfo(int network) {
   //JMB check to see if we can actually open required files ...
   ofstream tmpfile;
   if (!network) {
-    tmpfile.open(strParamOutFile, ios::out);
+    tmpfile.open(strParamOutFile, ios::binary);
     handle.checkIfFailure(tmpfile, strParamOutFile);
     tmpfile.close();
     tmpfile.clear();
   }
   if (printoutput) {
-    tmpfile.open(strOutputFile, ios::out);
+    tmpfile.open(strOutputFile, ios::binary);
     handle.checkIfFailure(tmpfile, strOutputFile);
     tmpfile.close();
     tmpfile.clear();
