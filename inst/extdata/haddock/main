@@ -1,7 +1,7 @@
 ;
 ; Main file for the haddock example
 ;
-timefile    time        ; specifying years 1978-2006
+timefile    time        ; specifying years 1978-2020
 areafile    area        ; specifying only one area
 printfiles  printfile   ; specifying the printer classes
 ;
