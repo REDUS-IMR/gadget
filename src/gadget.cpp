@@ -101,7 +101,7 @@ Rcpp::IntegerVector updateAmountYear(Rcpp::IntegerVector fleetNo, Rcpp::IntegerV
    else
       return Rcpp::IntegerVector(1, 55);
 
-   Rcpp::Rcout << "Step is" << timeid << std::endl;
+   Rcpp::Rcout << "Step is " << timeid << std::endl;
 
    Rcpp::IntegerVector timeidvec(1,timeid);
 
@@ -122,6 +122,12 @@ Rcpp::IntegerVector getEcosystemTime(Ecosystem* e){
 			       Rcpp::_["finished"] = res);
 }
 
+//' Get the simulation ecosystem objects
+//' 
+//' This function returns a vector of information about the running gadget
+//' simulation's stocks, fleet, state, and time information.
+//'
+//' @export
 // [[Rcpp::export]]
 Rcpp::List getEcosystemInfo() {
 

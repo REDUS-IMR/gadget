@@ -1,19 +1,11 @@
 library(gadgetr)
 
-# Change working directory to example haddock data
-currDir <- getwd()
-gadgetr:::loadExample()
-
-# Load parameters
-gadgetr:::gadget(c("-s","-i","refinputfile"))
-
-setwd(currDir)
-
-# Initialize simulation
-gadgetr:::initSim()
+# Init the example haddock data
+exPath <- gadgetr::loadExample()
+gadgetr::initGadget(exPath, "refinputfile")
 
 # Get initial information
-initial <- gadgetr:::getEcosystemInfo()
+initial <- gadgetr::getEcosystemInfo()
 
 # Print start year
 print(initial$time["currentYear"])
@@ -29,9 +21,9 @@ lengthStep <- 1
 stats <- list()
 while (TRUE){
 	# Append stats
-	stats[[lengthStep]] <- gadgetr:::runStep()
+	stats[[lengthStep]] <- gadgetr::runStep()
 	# Stop at the end of time
-	status <- gadgetr:::getEcosystemInfo()
+	status <- gadgetr::getEcosystemInfo()
         if(status[["time"]]["finished"] == 1) break
 	lengthStep <- lengthStep + 1
 }
@@ -39,7 +31,7 @@ while (TRUE){
 print(lengthStep)
 
 # Get termination information
-term <- gadgetr:::getEcosystemInfo()
+term <- gadgetr::getEcosystemInfo()
 
 # Print end year
 print(term$time["currentYear"])
@@ -50,24 +42,21 @@ print(term$time["currentTime"])
 print(lengthStep)
 
 # Print out all status
-names(stats[[1]])
-names(stats[[1]]$stock)
-names(stats[[1]]$fleet)
+print(names(stats[[1]]))
+print(names(stats[[1]]$stock))
+print(names(stats[[1]]$fleet))
 
 # Print haddock stock in step 1
-names(stats[[1]]$stock$had)
-stats[[1]]$stock$had$stk
+print(names(stats[[1]]$stock$had))
+print(stats[[1]]$stock$had$stk)
 
 # Print haddock recruitment in step 1
-stats[[1]]$stock$had$rec
+print(stats[[1]]$stock$had$rec)
 
 # Print haddock catch by commercial fleet in step 1
-names(stats[[1]]$fleet)
-names(stats[[1]]$fleet$comm$catch)
-stats[[1]]$fleet$comm$catch$had
+print(names(stats[[1]]$fleet))
+print(names(stats[[1]]$fleet$comm$catch))
+print(stats[[1]]$fleet$comm$catch$had)
 
 # Sim cleanup
-gadgetr:::finalizeSim()
-
-# Gadget cleanup
-out <- gadgetr:::finalize()
+gadgetr::endGadget()

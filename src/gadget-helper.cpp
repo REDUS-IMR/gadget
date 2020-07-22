@@ -533,7 +533,7 @@ Rcpp::NumericMatrix printDetailedSSB(Rcpp::IntegerVector stockNo){
 }
 
 // [[Rcpp::export]]
-Rcpp::IntegerVector updateRecruitmentC(Rcpp::IntegerVector stockNo, Rcpp::NumericVector recruitParams){
+Rcpp::IntegerVector updateSpawningRecC(Rcpp::IntegerVector stockNo, Rcpp::NumericVector recruitParams){
 
    int j;
    int functionnumber, paramsize;

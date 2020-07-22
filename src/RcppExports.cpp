@@ -99,15 +99,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// updateRecruitmentC
-Rcpp::IntegerVector updateRecruitmentC(Rcpp::IntegerVector stockNo, Rcpp::NumericVector recruitParams);
-RcppExport SEXP _gadgetr_updateRecruitmentC(SEXP stockNoSEXP, SEXP recruitParamsSEXP) {
+// updateSpawningRecC
+Rcpp::IntegerVector updateSpawningRecC(Rcpp::IntegerVector stockNo, Rcpp::NumericVector recruitParams);
+RcppExport SEXP _gadgetr_updateSpawningRecC(SEXP stockNoSEXP, SEXP recruitParamsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type stockNo(stockNoSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type recruitParams(recruitParamsSEXP);
-    rcpp_result_gen = Rcpp::wrap(updateRecruitmentC(stockNo, recruitParams));
+    rcpp_result_gen = Rcpp::wrap(updateSpawningRecC(stockNo, recruitParams));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -262,7 +262,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_gadgetr_printPredatorPrey", (DL_FUNC) &_gadgetr_printPredatorPrey, 3},
     {"_gadgetr_printStock", (DL_FUNC) &_gadgetr_printStock, 1},
     {"_gadgetr_printDetailedSSB", (DL_FUNC) &_gadgetr_printDetailedSSB, 1},
-    {"_gadgetr_updateRecruitmentC", (DL_FUNC) &_gadgetr_updateRecruitmentC, 2},
+    {"_gadgetr_updateSpawningRecC", (DL_FUNC) &_gadgetr_updateSpawningRecC, 2},
     {"_gadgetr_printSSB", (DL_FUNC) &_gadgetr_printSSB, 1},
     {"_gadgetr_printRecruitment", (DL_FUNC) &_gadgetr_printRecruitment, 1},
     {"_gadgetr_wholeSim", (DL_FUNC) &_gadgetr_wholeSim, 0},

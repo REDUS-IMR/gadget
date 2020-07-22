@@ -29,8 +29,8 @@ printDetailedSSB <- function(stockNo) {
     .Call('_gadgetr_printDetailedSSB', PACKAGE = 'gadgetr', stockNo)
 }
 
-updateRecruitmentC <- function(stockNo, recruitParams) {
-    .Call('_gadgetr_updateRecruitmentC', PACKAGE = 'gadgetr', stockNo, recruitParams)
+updateSpawningRecC <- function(stockNo, recruitParams) {
+    .Call('_gadgetr_updateSpawningRecC', PACKAGE = 'gadgetr', stockNo, recruitParams)
 }
 
 printSSB <- function(stockNo) {
@@ -53,6 +53,12 @@ updateAmountYear <- function(fleetNo, year, step, area, value) {
     .Call('_gadgetr_updateAmountYear', PACKAGE = 'gadgetr', fleetNo, year, step, area, value)
 }
 
+#' Get the simulation ecosystem objects
+#' 
+#' This function returns a vector of information about the running gadget
+#' simulation's stocks, fleet, state, and time information.
+#'
+#' @export
 getEcosystemInfo <- function() {
     .Call('_gadgetr_getEcosystemInfo', PACKAGE = 'gadgetr')
 }
