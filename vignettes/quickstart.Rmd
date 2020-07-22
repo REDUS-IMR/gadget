@@ -1,0 +1,182 @@
+---
+title: "Gadget-R: Quick Start Guide"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{quickstart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+# Installing the package
+
+As for now, the package is yet to find its way into CRAN. Therefore, we need
+to install it from the alternative repo:
+
+
+Or, you might want to compile it from the source code:
+
+```{r eval=FALSE}
+devtools::install_github("REDUS-IMR/gadget", ref="gadgetr")
+```
+
+# Running the sample haddock model
+
+This guide demonstrates the ability of controlling a gadget model run and
+extracting relevant information from the run. 
+
+## Loading the package
+
+After installing, the following command will load the package.
+
+```{r setup}
+library(gadgetr)
+```
+
+## Loading the example model
+
+The package ships with an example haddock model. What we need to do is
+calling ```loadExample()``` to obtain the full path of the model.
+
+```{r}
+# Get the path of the example haddock data
+exPath <- gadgetr::loadExample()
+print(exPath)
+```
+
+To initialize a gadget run, we have to specify the full path of the model
+and also the input file. In the example model, the input file is the file
+named `refinputfile`.
+
+```{r}
+# Init the haddock model
+gadgetr::initGadget(exPath, "refinputfile")
+```
+
+The ```initGadget()``` function instructs gadget to load the model and 
+preparing the internal data structure. If successful, the model is now ready
+to be run.
+
+## Printing the model ecosystem information
+
+Now that the model is loaded, we might want to inspect some of the important
+objects in the simulation. The ```getEcosystemInfo()``` is a useful function
+that provides this type of information.
+
+```{r}
+# Get the initial information
+initial <- gadgetr::getEcosystemInfo()
+print(initial)
+
+# Print start year
+print(initial$time["currentYear"])
+# Print initial step number
+print(initial$time["currentTime"])
+# Print final step number
+print(initial$time["totalSteps"])
+```
+
+## Moving the simulation forward
+
+As we can see in the previous section, the sample haddock model has a number
+of simulation steps. Now let's loop through the time while collecting
+the important statistics for the fleets and the stocks.
+
+The package provides two alternative functions to forward the simulation
+time. These functions are ```runStep()``` and ```runYear()```, which forward
+the simulation by a step and a year, respectively. Both functions returns
+the statistics of both stocks and fleets objects at that particular step or
+year.
+
+```{r}
+# Variable for counting step
+lengthStep <- 1
+
+# Loop for all steps
+stats <- list()
+while (TRUE){
+	# Append stats
+	stats[[lengthStep]] <- gadgetr::runStep()
+	# Stop at the end of time
+	status <- gadgetr::getEcosystemInfo()
+        if(status[["time"]]["finished"] == 1) break
+	lengthStep <- lengthStep + 1
+}
+
+print(lengthStep)
+
+# Get termination information
+term <- gadgetr::getEcosystemInfo()
+
+# Print end year
+print(term$time["currentYear"])
+print(initial$time["currentYear"] + (lengthStep / 4) - 1)
+
+# Print last step number
+print(term$time["currentTime"])
+print(lengthStep)
+```
+
+In the above code, a condition ```status[["time"]]["finished"] == 1```
+terminates the loop. The ```getEcosystemInfo()``` gives an updated status of
+the model run whenever it called. It also gives an information whether the
+simulation has reached to an end.
+
+You may also safely replace the ```runStep()``` with ```runYear()``` in the
+above code. However, the content of the statistics in the ```stats``` objects
+won't be breaked down into steps as you might have with ```runStep()```,
+because ```runYear()``` will aggregate the steps' statistics of the model's
+objects.
+
+## Inspecting the simulation output
+
+The greatest advantage of this package is its ability to extract and modify
+information directly from/to the gadget's internal runtime objects in memory.
+This will save user from tinkering with the gadget model configuration files 
+and also it output printing files.
+
+This guide won't cover the on-the-fly modification of a gagdet internal
+objects. However, the code below should demonstrates the package ability on
+gadget information extraction. 
+
+```{r}
+# Print out all status
+print(names(stats[[1]]))
+print(names(stats[[1]]$stock))
+print(names(stats[[1]]$fleet))
+
+# Print haddock stock in step 1
+print(names(stats[[1]]$stock$had))
+print(tail(stats[[1]]$stock$had$stk))
+
+# Print haddock recruitment in step 1
+print(names(stats[[1]]$stock$had$rec))
+print(tail(stats[[1]]$stock$had$rec$renew))
+print(stats[[1]]$stock$had$rec$spawn)
+
+# Print haddock catch by commercial fleet in step 1
+print(names(stats[[1]]$fleet))
+print(names(stats[[1]]$fleet$comm$catch))
+print(tail(stats[[1]]$fleet$comm$catch$had))
+```
+
+## Terminating the model run
+
+After each simulation, it is necessary for user to properly terminate an active
+gadget simulation run. Use the code below after you finished with a simulation
+run or if you want to restart the current model or loading a new model.
+
+```{r}
+# Sim cleanup
+gadgetr::endGadget()
+```
+
+The above function will remove all gadget internal runtime objects from memory
+and ensure gadget library is ready to start another simulation run.
