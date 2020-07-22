@@ -169,6 +169,7 @@
 /* This means that the function has been replaced by a call to ecosystem    */
 /* object, and we can use the vector objects that have been defined         */
 
+#include "aarand.h"
 #include "gadget.h"    //All the required standard header files are in here
 #include "optinfo.h"
 #include "mathfunc.h"
@@ -262,7 +263,7 @@ void OptInfoSimann::OptimiseLikelihood() {
       //the order having an influence on which changes are accepted
       rchange = 0;
       while (rchange < nvars) {
-        rnumber = rand() % nvars;
+        rnumber = myrand::rand() % nvars;
         rcheck = 1;
         for (i = 0; i < rchange; i++)
           if (param[i] == rnumber)

@@ -130,6 +130,7 @@
 /* This means that the function has been replaced by a call to ecosystem */
 /* object, and we can use the vector objects that have been defined      */
 
+#include "aarand.h"
 #include "gadget.h"    //All the required standard header files are in here
 #include "optinfo.h"
 #include "mathfunc.h"
@@ -211,7 +212,7 @@ void OptInfoHooke::OptimiseLikelihood() {
     bestx[i] = x[i];
     trialx[i] = x[i];
     param[i] = i;
-    delta[i] = ((2 * (rand() % 2)) - 1) * rho;  //JMB - randomise the sign
+    delta[i] = ((2 * (myrand::rand() % 2)) - 1) * rho;  //JMB - randomise the sign
   }
 
   bestf = EcoSystem->SimulateAndUpdate(trialx);
@@ -240,7 +241,7 @@ void OptInfoHooke::OptimiseLikelihood() {
     /* randomize the order of the parameters once in a while */
     rchange = 0;
     while (rchange < nvars) {
-      rnumber = rand() % nvars;
+      rnumber = myrand::rand() % nvars;
       rcheck = 1;
       for (i = 0; i < rchange; i++)
         if (param[i] == rnumber)

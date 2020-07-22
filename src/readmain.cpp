@@ -1,3 +1,4 @@
+#include "aarand.h"
 #include "ecosystem.h"
 #include "keeper.h"
 #include "stockstdprinter.h"
@@ -299,7 +300,7 @@ void Ecosystem::readOptimisation(CommentStream& infile) {
       int seed = 0;
       infile >> seed >> ws;
       handle.logMessage(LOGMESSAGE, "Initialising random number generator with", seed);
-      srand(seed);
+      myrand::srand(seed);
       if (!infile.eof())
         infile >> text;
     }

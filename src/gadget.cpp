@@ -6,7 +6,9 @@
 #include "stochasticdata.h"
 #include "interrupthandler.h"
 #include "global.h"
+#include "aarand.h"
 #include <Rcpp.h>
+
 
 Ecosystem* EcoSystem;
 
@@ -240,7 +242,7 @@ Rcpp::List gadget(Rcpp::StringVector args) {
   check = 0;
 
   //Initialise random number generator with system time [MNAA 02.02.26]
-  srand((int)time(NULL));
+  myrand::srand((int)time(NULL));
 
   //Test to see if the function double lgamma(double) is returning an integer.
   //lgamma is a non-ansi function and on some platforms when compiled with the

@@ -3,6 +3,7 @@
 #include "gadget.h"
 #include "runid.h"
 #include "global.h"
+#include "aarand.h"
 #include <Rcpp.h>
 
 void MainInfo::showCorrectUsage(char* error) {
@@ -221,7 +222,7 @@ void MainInfo::read(int aNumber, char* const aVector[]) {
       if (k == aNumber - 1)
         this->showCorrectUsage(aVector[k]);
       k++;
-      srand(atoi(aVector[k]));
+      myrand::srand(atoi(aVector[k]));
 
     } else if (strcasecmp(aVector[k], "-maxratio") == 0) {
       //JMB experimental setting of maximum ratio of stock consumed in one timestep
@@ -405,7 +406,7 @@ void MainInfo::read(CommentStream& infile) {
       infile >> printLogLevel >> ws;
     } else if (strcasecmp(text, "-seed") == 0) {
       infile >> dummy >> ws;
-      srand(dummy);
+      myrand::srand(dummy);
     } else if (strcasecmp(text, "-maxratio") == 0) {
       infile >> maxratio >> ws;
     } else if (strcasecmp(text, "-printlikesummary") == 0) {
