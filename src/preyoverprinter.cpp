@@ -40,7 +40,7 @@ PreyOverPrinter::PreyOverPrinter(CommentStream& infile, const TimeClass* const T
   CommentStream subdata(datafile);
 
   infile >> filename >> ws;
-  datafile.open(filename, ios::in);
+  datafile.open(filename, ios::binary);
   handle.checkIfFailure(datafile, filename);
   handle.Open(filename);
   i = readAggregation(subdata, areas, areaindex);
@@ -51,7 +51,7 @@ PreyOverPrinter::PreyOverPrinter(CommentStream& infile, const TimeClass* const T
   //read in length aggregation from file
   DoubleVector lengths;
   readWordAndValue(infile, "lenaggfile", filename);
-  datafile.open(filename, ios::in);
+  datafile.open(filename, ios::binary);
   handle.checkIfFailure(datafile, filename);
   handle.Open(filename);
   i = readLengthAggregation(subdata, lengths, lenindex);
@@ -66,7 +66,7 @@ PreyOverPrinter::PreyOverPrinter(CommentStream& infile, const TimeClass* const T
 
   //Open the printfile
   readWordAndValue(infile, "printfile", filename);
-  outfile.open(filename, ios::out);
+  outfile.open(filename, ios::binary);
   handle.checkIfFailure(outfile, filename);
 
   infile >> text >> ws;

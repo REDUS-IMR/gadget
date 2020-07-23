@@ -253,7 +253,7 @@ void Keeper::openPrintFile(const char* const filename) {
   if (fileopen)
     handle.logMessage(LOGFAIL, "Error in keeper - cannot open output file");
   fileopen = 1;
-  outfile.open(filename, ios::out);
+  outfile.open(filename, ios::binary);
   handle.checkIfFailure(outfile, filename);
   handle.Open(filename);
   outfile << "; ";
@@ -399,7 +399,7 @@ void Keeper::writeParams(const OptInfoPtrVector& optvec, const char* const filen
 
   int i, p, w, check;
   ofstream paramfile;
-  paramfile.open(filename, ios::out);
+  paramfile.open(filename, ios::binary);
   handle.checkIfFailure(paramfile, filename);
   handle.Open(filename);
 

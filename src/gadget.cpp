@@ -6,7 +6,9 @@
 #include "stochasticdata.h"
 #include "interrupthandler.h"
 #include "global.h"
+#include "aarand.h"
 #include <Rcpp.h>
+
 
 Ecosystem* EcoSystem;
 
@@ -101,7 +103,7 @@ Rcpp::IntegerVector updateAmountYear(Rcpp::IntegerVector fleetNo, Rcpp::IntegerV
    else
       return Rcpp::IntegerVector(1, 55);
 
-   Rcpp::Rcout << "Step is" << timeid << std::endl;
+   Rcpp::Rcout << "Step is " << timeid << std::endl;
 
    Rcpp::IntegerVector timeidvec(1,timeid);
 
@@ -122,6 +124,12 @@ Rcpp::IntegerVector getEcosystemTime(Ecosystem* e){
 			       Rcpp::_["finished"] = res);
 }
 
+//' Get the simulation ecosystem objects
+//' 
+//' This function returns a vector of information about the running gadget
+//' simulation's stocks, fleet, state, and time information.
+//'
+//' @export
 // [[Rcpp::export]]
 Rcpp::List getEcosystemInfo() {
 
@@ -152,6 +160,11 @@ Rcpp::List getEcosystemInfo() {
 
 }
 
+//' Low level simulation initialization
+//' 
+//' This function do a low level simulation initialization
+//'
+//' @export
 // [[Rcpp::export]]
 Rcpp::IntegerVector initSim(){
    EcoSystem->initSimulation();
@@ -212,6 +225,29 @@ Rcpp::List finalize(){
   return Rcpp::List::create(R_NilValue);
 }
 
+//' A low level gadget run
+//'
+//' This function initializes gadget using a given string vector argument.
+//' This is equivalent to running gadget from the command line. Please change
+//' the working directory (e.g., by \code{\link{setwd}})to the model directory
+//' before calling this function. Must be followed by \code{\link{initSim}}
+//'
+//' @param args A vector of string arguments
+//'
+//' @seealso \code{\link{initGadget}} for the recommended way to initialize
+//' gadget.
+//'
+//' @examples
+//' \dontrun{
+//'  if(interactive()){
+//'   exPath <- loadExample()
+//'   setwd(exPath)
+//'   gadget(c("-s", "-main", "main", "-i", "refinputfile"))
+//'   initSim()
+//'  }
+//' }
+//'
+//' @export
 // [[Rcpp::export]]
 Rcpp::List gadget(Rcpp::StringVector args) {
 
@@ -234,7 +270,7 @@ Rcpp::List gadget(Rcpp::StringVector args) {
   check = 0;
 
   //Initialise random number generator with system time [MNAA 02.02.26]
-  srand((int)time(NULL));
+  myrand::srand((int)time(NULL));
 
   //Test to see if the function double lgamma(double) is returning an integer.
   //lgamma is a non-ansi function and on some platforms when compiled with the

@@ -1,14 +1,21 @@
 Package: gadgetr
 Type: Package
 Title: Gadget as an R package
-Version: 0.1
-Date: 2017-11-17
+Version: 0.9.0
+Date: 2020-07-22
 Author: Ibrahim Umar
-Maintainer: Ibrahim Umar <ibrahim.umar@imr.no>
+Maintainer: Ibrahim Umar <ibrahim.umar@hi.no>
 Description: Gadget program (https://github.com/Hafro/gadget) re-packaged as an 
 	R package.
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.12.13)
+Imports:
+    Rcpp (>= 0.12.13),
+    methods
 LinkingTo: Rcpp
-RoxygenNote: 6.0.1
-Suggests: testthat
+RoxygenNote: 7.1.0
+Encoding: UTF-8
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

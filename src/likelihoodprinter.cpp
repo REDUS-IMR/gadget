@@ -36,7 +36,7 @@ LikelihoodPrinter::LikelihoodPrinter(CommentStream& infile, const TimeClass* con
   if (strcasecmp(text, "printfile") != 0)
     handle.logFileUnexpected(LOGFAIL, "printfile", text);
   infile >> filename >> ws;
-  outfile.open(filename, ios::out);
+  outfile.open(filename, ios::binary);
   handle.checkIfFailure(outfile, filename);
 
   //JMB - removed the need to read in the yearsandsteps data

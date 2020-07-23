@@ -1,17 +1,9 @@
 context("gadget")
 
 test_that("step sim works", {
-  # Change working directory to example haddock data
-  currDir <- getwd()
-  loadExample()
-
-  # Load parameters
-  gadget(c("-s","-i","refinputfile"))
-
-  setwd(currDir)
-
-  # Initialize simulation
-  initSim()
+  # Init the example haddock data
+  exPath <- gadgetr::loadExample()
+  gadgetr::initGadget(exPath, "refinputfile")
 
   # Count steps
   lengthSteps <- 0
@@ -25,26 +17,15 @@ test_that("step sim works", {
   }
 
   # Sim cleanup
-  finalizeSim()
+  gadgetr::endGadget()  
 
-  # Gadget cleanup
-  out <- finalize()
-  
-  expect_equal(lengthSteps, 115)
+  expect_equal(lengthSteps, 171)
 })
 
 test_that("year sim works", {
-  # Change working directory to example haddock data
-  currDir <- getwd()
-  loadExample()
-
-  # Load parameters
-  gadget(c("-s","-i","refinputfile"))
-
-  setwd(currDir)
-
-  # Initialize simulation
-  initSim()
+  # Init the example haddock data
+  exPath <- gadgetr::loadExample()
+  gadgetr::initGadget(exPath, "refinputfile")
 
   # Count year
   lengthYear <- 0
@@ -60,10 +41,7 @@ test_that("year sim works", {
   print(lengthYear)
 
   # Sim cleanup
-  finalizeSim()
+  gadgetr::endGadget()
 
-  # Gadget cleanup
-  out <- finalize()
-
-  expect_equal(lengthYear, 28)
+  expect_equal(lengthYear, 42)
 })

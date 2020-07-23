@@ -2,86 +2,120 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 setEating <- function(stockNo, val) {
-    .Call(`_gadgetr_setEating`, stockNo, val)
+    .Call('_gadgetr_setEating', PACKAGE = 'gadgetr', stockNo, val)
 }
 
 getStockInfoC <- function(stockNo) {
-    .Call(`_gadgetr_getStockInfoC`, stockNo)
+    .Call('_gadgetr_getStockInfoC', PACKAGE = 'gadgetr', stockNo)
 }
 
 updateRenewalC <- function(stockNo, year, step, area, age, number, mean, sdev, alpha, beta, length, meanWeight) {
-    .Call(`_gadgetr_updateRenewalC`, stockNo, year, step, area, age, number, mean, sdev, alpha, beta, length, meanWeight)
+    .Call('_gadgetr_updateRenewalC', PACKAGE = 'gadgetr', stockNo, year, step, area, age, number, mean, sdev, alpha, beta, length, meanWeight)
 }
 
 updateSuitabilityC <- function(fleetNo, stockNo, len, value) {
-    .Call(`_gadgetr_updateSuitabilityC`, fleetNo, stockNo, len, value)
+    .Call('_gadgetr_updateSuitabilityC', PACKAGE = 'gadgetr', fleetNo, stockNo, len, value)
 }
 
 printPredatorPrey <- function(predatorNo, stockNo, predatorType) {
-    .Call(`_gadgetr_printPredatorPrey`, predatorNo, stockNo, predatorType)
+    .Call('_gadgetr_printPredatorPrey', PACKAGE = 'gadgetr', predatorNo, stockNo, predatorType)
 }
 
 printStock <- function(stockNo) {
-    .Call(`_gadgetr_printStock`, stockNo)
+    .Call('_gadgetr_printStock', PACKAGE = 'gadgetr', stockNo)
 }
 
 printDetailedSSB <- function(stockNo) {
-    .Call(`_gadgetr_printDetailedSSB`, stockNo)
+    .Call('_gadgetr_printDetailedSSB', PACKAGE = 'gadgetr', stockNo)
 }
 
-updateRecruitmentC <- function(stockNo, recruitParams) {
-    .Call(`_gadgetr_updateRecruitmentC`, stockNo, recruitParams)
+updateSpawningRecC <- function(stockNo, recruitParams) {
+    .Call('_gadgetr_updateSpawningRecC', PACKAGE = 'gadgetr', stockNo, recruitParams)
 }
 
 printSSB <- function(stockNo) {
-    .Call(`_gadgetr_printSSB`, stockNo)
+    .Call('_gadgetr_printSSB', PACKAGE = 'gadgetr', stockNo)
 }
 
 printRecruitment <- function(stockNo) {
-    .Call(`_gadgetr_printRecruitment`, stockNo)
+    .Call('_gadgetr_printRecruitment', PACKAGE = 'gadgetr', stockNo)
 }
 
 wholeSim <- function() {
-    .Call(`_gadgetr_wholeSim`)
+    .Call('_gadgetr_wholeSim', PACKAGE = 'gadgetr')
 }
 
 updateAmountStep <- function(fleetNo, step, area, value) {
-    .Call(`_gadgetr_updateAmountStep`, fleetNo, step, area, value)
+    .Call('_gadgetr_updateAmountStep', PACKAGE = 'gadgetr', fleetNo, step, area, value)
 }
 
 updateAmountYear <- function(fleetNo, year, step, area, value) {
-    .Call(`_gadgetr_updateAmountYear`, fleetNo, year, step, area, value)
+    .Call('_gadgetr_updateAmountYear', PACKAGE = 'gadgetr', fleetNo, year, step, area, value)
 }
 
+#' Get the simulation ecosystem objects
+#' 
+#' This function returns a vector of information about the running gadget
+#' simulation's stocks, fleet, state, and time information.
+#'
+#' @export
 getEcosystemInfo <- function() {
-    .Call(`_gadgetr_getEcosystemInfo`)
+    .Call('_gadgetr_getEcosystemInfo', PACKAGE = 'gadgetr')
 }
 
+#' Low level simulation initialization
+#' 
+#' This function do a low level simulation initialization
+#'
+#' @export
 initSim <- function() {
-    .Call(`_gadgetr_initSim`)
+    .Call('_gadgetr_initSim', PACKAGE = 'gadgetr')
 }
 
 stepSim <- function() {
-    .Call(`_gadgetr_stepSim`)
+    .Call('_gadgetr_stepSim', PACKAGE = 'gadgetr')
 }
 
 yearSim <- function() {
-    .Call(`_gadgetr_yearSim`)
+    .Call('_gadgetr_yearSim', PACKAGE = 'gadgetr')
 }
 
 finalizeSim <- function() {
-    .Call(`_gadgetr_finalizeSim`)
+    .Call('_gadgetr_finalizeSim', PACKAGE = 'gadgetr')
 }
 
 finalize <- function() {
-    .Call(`_gadgetr_finalize`)
+    .Call('_gadgetr_finalize', PACKAGE = 'gadgetr')
 }
 
+#' A low level gadget run
+#'
+#' This function initializes gadget using a given string vector argument.
+#' This is equivalent to running gadget from the command line. Please change
+#' the working directory (e.g., by \code{\link{setwd}})to the model directory
+#' before calling this function. Must be followed by \code{\link{initSim}}
+#'
+#' @param args A vector of string arguments
+#'
+#' @seealso \code{\link{initGadget}} for the recommended way to initialize
+#' gadget.
+#'
+#' @examples
+#' \dontrun{
+#'  if(interactive()){
+#'   exPath <- loadExample()
+#'   setwd(exPath)
+#'   gadget(c("-s", "-main", "main", "-i", "refinputfile"))
+#'   initSim()
+#'  }
+#' }
+#'
+#' @export
 gadget <- function(args) {
-    .Call(`_gadgetr_gadget`, args)
+    .Call('_gadgetr_gadget', PACKAGE = 'gadgetr', args)
 }
 
 isGadgetInitialized <- function() {
-    .Call(`_gadgetr_isGadgetInitialized`)
+    .Call('_gadgetr_isGadgetInitialized', PACKAGE = 'gadgetr')
 }
 

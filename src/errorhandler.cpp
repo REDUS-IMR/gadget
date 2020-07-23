@@ -60,7 +60,7 @@ void ErrorHandler::setLogLevel(int level) {
 
 void ErrorHandler::setLogFile(const char* filename) {
   uselog = 1;
-  logfile.open(filename, ios::out);
+  logfile.open(filename, ios::binary);
   this->checkIfFailure(logfile, filename);
 #ifndef GADGET_NETWORK
   RUNID.Print(logfile);

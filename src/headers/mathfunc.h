@@ -1,6 +1,7 @@
 #ifndef mathfunc_h
 #define mathfunc_h
 
+#include "aarand.h"
 #include "gadget.h"
 
 /**
@@ -108,7 +109,7 @@ inline double expRep(double n) {
  * \note This function generates uniformly-distributed doubles in the range 0.0 to 1.0
  */
 inline double randomNumber() {
-  int r = rand();
+  int r = myrand::rand();
   double k = r % 32767;
   return (k / 32767.0);
 }

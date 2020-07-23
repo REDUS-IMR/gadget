@@ -1,3 +1,4 @@
+#include "aarand.h"
 #include "optinfo.h"
 #include "errorhandler.h"
 #include "gadget.h"
@@ -20,7 +21,7 @@ void OptInfoBFGS::read(CommentStream& infile, char* text) {
       int seed = 0;
       infile >> seed >> ws;
       handle.logMessage(LOGMESSAGE, "Initialising random number generator with", seed);
-      srand(seed);
+      myrand::srand(seed);
 
     } else if (strcasecmp(text,"beta") == 0) {
       infile >> beta;
