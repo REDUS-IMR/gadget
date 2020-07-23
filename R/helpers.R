@@ -45,8 +45,10 @@ endGadget <- function() {
 		print("No instance of gadget simulation is active in memory. Exiting.")
 		return(NULL)
 	}
-	finalizeSim()
-	finalize()
+	invisible(finalizeSim())
+	invisible(finalize())
+	print("Gadget succesfully terminates.")
+	return(NULL)
 }
 
 #' @title Get the predatory (eating/catch) statistics of a stock/fleet subject 
