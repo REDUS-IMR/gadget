@@ -158,7 +158,7 @@ runYear <- function() {
 	combineStats <- function(x, path) {
 		path <- c(path, names(x))
 		y <- x[[1]]
-		if (class(y) == "list") {
+		if (is(y, "list")) {
 			for(i in names(y))
 				combineStats(y[i], path)
 		} else {
@@ -244,7 +244,7 @@ runStep <- function(stockAfterStep = FALSE) {
 	combineStats <- function(x, path) {
 		path <- c(path, names(x))
 		y <- x[[1]]
-		if (class(y) == "list") {
+		if (is(y, "list")) {
 			for(i in names(y))
 				combineStats(y[i], path)
 		} else {
