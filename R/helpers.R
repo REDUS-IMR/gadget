@@ -149,6 +149,7 @@ processStockStats <- function(stocks, pre = TRUE) {
 #'  }
 #' }
 #' @rdname runYear
+#' @importFrom methods is
 #' @export 
 runYear <- function() {
 
@@ -235,6 +236,7 @@ runYear <- function() {
 #'  }
 #' }
 #' @rdname runStep
+#' @importFrom methods is
 #' @export 
 runStep <- function(stockAfterStep = FALSE) {
 

@@ -8,7 +8,9 @@ Maintainer: Ibrahim Umar <ibrahim.umar@hi.no>
 Description: Gadget program (https://github.com/Hafro/gadget) re-packaged as an 
 	R package.
 License: GPL (>= 2)
-Imports: Rcpp (>= 0.12.13)
+Imports:
+    Rcpp (>= 0.12.13),
+    methods
 LinkingTo: Rcpp
 RoxygenNote: 7.1.0
 Encoding: UTF-8
