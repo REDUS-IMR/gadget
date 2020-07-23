@@ -63,6 +63,11 @@ getEcosystemInfo <- function() {
     .Call('_gadgetr_getEcosystemInfo', PACKAGE = 'gadgetr')
 }
 
+#' Low level simulation initialization
+#' 
+#' This function do a low level simulation initialization
+#'
+#' @export
 initSim <- function() {
     .Call('_gadgetr_initSim', PACKAGE = 'gadgetr')
 }
@@ -83,6 +88,29 @@ finalize <- function() {
     .Call('_gadgetr_finalize', PACKAGE = 'gadgetr')
 }
 
+#' A low level gadget run
+#'
+#' This function initializes gadget using a given string vector argument.
+#' This is equivalent to running gadget from the command line. Please change
+#' the working directory (e.g., by \code{\link{setwd}})to the model directory
+#' before calling this function. Must be followed by \code{\link{initSim}}
+#'
+#' @param args A vector of string arguments
+#'
+#' @seealso \code{\link{initGadget}} for the recommended way to initialize
+#' gadget.
+#'
+#' @examples
+#' \dontrun{
+#'  if(interactive()){
+#'   exPath <- loadExample()
+#'   setwd(exPath)
+#'   gadget(c("-s", "-main", "main", "-i", "refinputfile"))
+#'   initSim()
+#'  }
+#' }
+#'
+#' @export
 gadget <- function(args) {
     .Call('_gadgetr_gadget', PACKAGE = 'gadgetr', args)
 }
