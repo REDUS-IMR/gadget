@@ -4,12 +4,14 @@
 \alias{initGadget}
 \title{Initialize a gadget simulation}
 \usage{
-initGadget(modelDir, inputfile)
+initGadget(modelDir, inputfile, mainfile = "main")
 }
 \arguments{
 \item{modelDir}{Path to the gadget model}
 
-\item{inputfile}{The name of the simulation input (or main) file}
+\item{inputfile}{The name of the model parameter input file}
+
+\item{mainfile}{The name of the model main file. Default: "main"}
 }
 \description{
 This function initialize a gadget simulation given a valid model directory and a input file.

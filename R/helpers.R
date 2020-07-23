@@ -2,10 +2,11 @@
 #' @description This function initialize a gadget simulation given a valid model directory and a input file.
 #' The simulation will not be run yet, please see the \code{\link{runStep}} and \code{\link{runYear}} functions.  
 #' @param modelDir Path to the gadget model
-#' @param inputfile The name of the simulation input (or main) file
+#' @param mainfile The name of the model main file. Default: "main"
+#' @param inputfile The name of the model parameter input file
 #' @rdname initGadget
 #' @export
-initGadget <- function(modelDir, inputfile) {
+initGadget <- function(modelDir, inputfile, mainfile = "main") {
 
 	if(isGadgetInitialized()) {
 		print("A previous instance of gadgetr run is active in memory. Please stop it first.")
@@ -27,11 +28,12 @@ initGadget <- function(modelDir, inputfile) {
 	currWD <- getwd()
 
 	setwd(modelDir)
-	gadget(c("-s", "-i", inputfile))
+	gadget(c("-s", "-main", mainfile, "-i", inputfile))
 	initSim()
 
 	setwd(currWD)
 	print(paste0("Gadget is started with the given model in ", modelDir, "."))
+	return(NULL)
 }
 
 #' @title Stop the active gadget simulation run
