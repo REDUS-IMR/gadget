@@ -99,7 +99,7 @@ jobs:
         if: runner.os == 'Linux' && matrix.config.r == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
         run: |
           file <- pkgbuild::build(".", dest_path = ".", binary = FALSE)
-          pkgver <- tail(unlist(strsplit(tools::file_path_sans_ext(file), "_")), 1)
+          pkgver <- tail(unlist(strsplit(tools::file_path_sans_ext(file, compression = TRUE), "_")), 1)
           cat(paste0("::set-env name=PKG_FREL::", file, "\n"))
           cat(paste0("::set-env name=PKG_VER::", pkgver, "\n"))
         shell: Rscript {0}
@@ -108,8 +108,8 @@ jobs:
         if: (runner.os == 'Windows' || runner.os == 'macOS') && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
         run: |
           file <- pkgbuild::build(".", dest_path = ".", binary = TRUE)
-          pkgver <- tail(unlist(strsplit(tools::file_path_sans_ext(file), "_")), 1)
-          binfile <- paste0(tools::file_path_sans_ext(basename(file)), "-", paste0(R.version$major, ".", R.version$minor), "-", R.version$os, ".",  tools::file_ext(file))
+          pkgver <- tail(unlist(strsplit(tools::file_path_sans_ext(file, compression = TRUE), "_")), 1)
+          binfile <- paste0(tools::file_path_sans_ext(basename(file), compression = TRUE), "-R", paste0(R.version$major, ".", R.version$minor), "-", R.version$os, ".",  tools::file_ext(file))
           file.copy(file, binfile)
           cat(paste0("::set-env name=PKG_FREL::", binfile, "\n"))
           cat(paste0("::set-env name=PKG_VER::", pkgver, "\n"))
@@ -123,5 +123,5 @@ jobs:
           commit: gadgetr
           tag: ${{ env.PKG_VER }}
           name: ${{ runner.os }}-R${{ matrix.config.r }}
-          artifacts: ${{ env.GITHUB_WORKSPACE }}/**/${{ env.PKG_FREL }}
+          artifacts: ${{ github.workspace }}/${{ env.PKG_FREL }}
           token: ${{ secrets.GITHUB_TOKEN }}
