@@ -1,0 +1,40 @@
+name: Add to drat
+on:
+  release:
+    types: [released]
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+            ref: 'gh-pages'
+            path: 'drat'
+      - name: Download release files
+        run: |
+            ## Download release assets
+            curl -s https://api.github.com/repos/redus-imr/gadget/releases/latest \
+            | grep browser_download_url \
+            | grep gadgetr \
+            | cut -d '"' -f4 \
+            | wget -qi -
+            export REL_FILES=$(ls gadgetr*)
+      - name: Add files
+        run: |
+            Rscript -e "library(drat); \
+            files <- unlist(strsplit(Sys.getenv(c(\"REL_FILES\")), \"\\n\")); \
+            for(f in files) { \
+                insertPackage(f, \
+                    repodir = './drat', \
+                    commit=FALSE) \
+            }"
+      - name: Push back repo
+        run: |
+            cd drat
+            git config user.name github-actions
+            git config user.email github-actions@github.com
+            git add .
+            git commit -m "Setup DRAT"
+            git push
+

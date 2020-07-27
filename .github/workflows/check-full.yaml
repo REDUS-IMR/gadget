@@ -119,6 +119,7 @@ jobs:
         if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
         uses: ncipollo/release-action@v1
         with:
+          draft: true
           allowUpdates: true
           commit: gadgetr
           tag: ${{ env.PKG_VER }}
