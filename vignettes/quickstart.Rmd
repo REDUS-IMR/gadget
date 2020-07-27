@@ -1,10 +1,13 @@
 ---
-title: "Gadget-R: Quick Start Guide"
+title: "GadgetR: Quick Start Guide"
+author: "Ibrahim Umar"
+date: "`r Sys.Date()`"
+package: gadgetr
 output: 
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{quickstart}
+  %\VignetteIndexEntry{GadgetR: Quick Start Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -17,24 +20,27 @@ knitr::opts_chunk$set(
 ```
 # Installing the package
 
-As for now, the package is yet to find its way into CRAN. Therefore, we need
-to install it from the alternative repo:
+As for now, the package is yet to find its way into CRAN. Therefore, you can
+download and install from the pre-compiled binaries here:
 
+```
+https://github.com/REDUS-IMR/gadget/releases/latest
+```
 
-Or, you might want to compile it from the source code:
+Or, you might want to compile it from the source in Github:
 
 ```{r eval=FALSE}
 devtools::install_github("REDUS-IMR/gadget", ref="gadgetr")
 ```
 
-# Running the sample haddock model
+# Running the sample Haddock model
 
-This guide demonstrates the ability of controlling a gadget model run and
-extracting relevant information from the run. 
+This guide demonstrates the gadgetr library ability of controlling a gadget
+model run and extracting the relevant information from the run. 
 
 ## Loading the package
 
-After installing, the following command will load the package.
+After installing, the following command will load the library.
 
 ```{r setup}
 library(gadgetr)
@@ -42,7 +48,7 @@ library(gadgetr)
 
 ## Loading the example model
 
-The package ships with an example haddock model. What we need to do is
+The library ships with an example haddock model. What we need to do is
 calling ```loadExample()``` to obtain the full path of the model.
 
 ```{r}
@@ -85,14 +91,14 @@ print(initial$time["totalSteps"])
 
 ## Moving the simulation forward
 
-As we can see in the previous section, the sample haddock model has a number
-of simulation steps. Now let's loop through the time while collecting
-the important statistics for the fleets and the stocks.
+As we can see in the previous section, the sample haddock model has a certain 
+number of simulation steps. Now let's loop through the time steps while
+collecting the important metrics from the fleets and the stocks.
 
 The package provides two alternative functions to forward the simulation
 time. These functions are ```runStep()``` and ```runYear()```, which forward
 the simulation by a step and a year, respectively. Both functions returns
-the statistics of both stocks and fleets objects at that particular step or
+the metrics from both stocks and fleets objects at that particular step or
 year.
 
 ```{r}
@@ -102,12 +108,12 @@ lengthStep <- 1
 # Loop for all steps
 stats <- list()
 while (TRUE){
-	# Append stats
-	stats[[lengthStep]] <- gadgetr::runStep()
-	# Stop at the end of time
-	status <- gadgetr::getEcosystemInfo()
-        if(status[["time"]]["finished"] == 1) break
-	lengthStep <- lengthStep + 1
+  # Append stats
+  stats[[lengthStep]] <- gadgetr::runStep()
+  # Stop at the end of time
+  status <- gadgetr::getEcosystemInfo()
+  if(status[["time"]]["finished"] == 1) break
+  lengthStep <- lengthStep + 1
 }
 
 print(lengthStep)
@@ -130,10 +136,10 @@ the model run whenever it called. It also gives an information whether the
 simulation has reached to an end.
 
 You may also safely replace the ```runStep()``` with ```runYear()``` in the
-above code. However, the content of the statistics in the ```stats``` objects
-won't be breaked down into steps as you might have with ```runStep()```,
-because ```runYear()``` will aggregate the steps' statistics of the model's
-objects.
+above code. However, the metrics content in the ```stats``` objects will not 
+be broke down into steps as you might have with ```runStep()``` function. 
+This is because ```runYear()``` function will aggregate the steps' metrics
+from the model's objects.
 
 ## Inspecting the simulation output
 
@@ -178,5 +184,5 @@ run or if you want to restart the current model or loading a new model.
 gadgetr::endGadget()
 ```
 
-The above function will remove all gadget internal runtime objects from memory
-and ensure gadget library is ready to start another simulation run.
+The `endGadget()` function will remove all gadget internal runtime objects from
+memory and ensure gadget library is ready to start another simulation run.
