@@ -1,13 +1,37 @@
 Package: gadgetr
 Type: Package
-Title: Gadget as an R package
+Title: GadgetR: Interactive and Exploratory Gadget Model Simulation in R
 Version: 0.9.0
 Date: 2020-07-22
-Author: Ibrahim Umar
+Authors@R: c(person("Bjarki Thor", "Elvarsson", email="bjarki.elvarsson@hafogvatn.is",role = c("aut", "cre")),
+            person("James","Begley", email="james@hafro.is",role=c("aut")),
+            person("Hoskuldur","Bjornsson", email="hoski@hafro.is",role=c("aut")),
+            person("Jamie", "Lentin", email="lentinj@shuttlethread.com",role = c("ctb")),
+            person("Gunnar","Stefnasson", email="gunnar@hi.is",role=c("ctb")),
+            person("Lorna","Taylor", email="lorna@hafro.is",role=c("ctb")),
+            person("Daniel","Howell", email="daniel.howell@hi.no",role=c("ctb")),
+            person("Ibrahim", "Umar", email="ibrahim.umar@hi.no",role=c("ctb")),
+            person("Sigurdur","Hannesson",role=c("ctb")),
+            person("Narfi","Stefansson",role=c("aut")),
+            person("Hersir","Sigurgeirsson", role = c("ctb")),
+            person("Morten Nygard","Asnes", role = c("ctb")),
+            person("Kristin","Froysa", role = c("ctb")),
+            person("Audbjorg","Jakobsdottir", role = c("ctb") ),
+            person("Jon","Gudmundsson", role = c("ctb")),
+            person("Gudmundur", "Einarsson", role = c("ctb")),
+            person("Thordis Linda","Thorarinsdottir",role = c("ctb")),
+            person("Kristjana Yr", "Jonsdottir", role = c("ctb")),
+            person("Mark G.","Johnson", role = c("ctb","cph")),
+            person("Bill","Goffe", role = c("ctb","cph")),
+            person("Marine and Freshwater Research Institute (Iceland)", role = c("cph")))
 Maintainer: Ibrahim Umar <ibrahim.umar@hi.no>
-Description: Gadget program (https://github.com/Hafro/gadget) re-packaged as an 
-	R package.
-License: GPL (>= 2)
+Copyright: see file COPYRIGHTS
+Description: Gadget program <https://github.com/Hafro/gadget2> re-packaged as
+    an R library while providing user with functions to control the model
+    simulation run as well as to modify and inspect the gadget internal
+    objects (such as stock recruitment parameters, fleet consumption amount,
+    among others) at any point in time during the simulation run.
+License: GPL-2
 Imports:
     Rcpp (>= 0.12.13),
     methods
@@ -19,3 +43,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+Biarch: true

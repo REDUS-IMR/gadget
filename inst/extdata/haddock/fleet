@@ -24,7 +24,6 @@ amount          fleet.data      ; where the catch data is stored
 [component]
 totalfleet      future          ; fleet name
 livesonareas    1               ; areas for the fleet
-multiplicative  #mult           ; scaling factor
 suitability
 had    function exponential       #acomm   #bcomm   0      1
 amount          fleet.predict   ; where the catch data is stored
