@@ -122,6 +122,6 @@ jobs:
           allowUpdates: true
           commit: gadgetr
           tag: ${{ env.PKG_VER }}
-          name: ${{ runner.os }}-R${{ matrix.config.r }}
+          name: Release-v${{ env.PKG_VER }}
           artifacts: ${{ github.workspace }}/${{ env.PKG_FREL }}
           token: ${{ secrets.GITHUB_TOKEN }}
