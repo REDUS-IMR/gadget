@@ -132,8 +132,7 @@ jobs:
           COUNT=$(curl -s https://api.github.com/repos/redus-imr/gadget/releases/tags/v${PKG_VER} \
           | grep browser_download_url \
           | grep gadgetr \
-          | cut -d '"' -f4 \
-          | wc -l)
+          | grep "^.*$" -c)
           echo "::set-env name=NUM_REL::${COUNT}"
         shell: bash
 
