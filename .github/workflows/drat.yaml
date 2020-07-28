@@ -27,12 +27,12 @@ jobs:
           | grep gadgetr \
           | cut -d '"' -f4 \
           | wget -qi -
-          export REL_FILES=$(ls gadgetr*)
+          echo "::set-env name=REL_FILES::$(ls gadgetr* | tr '\n' ',')"
 
       - name: Add files
         run: |
           Rscript -e "library(drat); \
-          files <- unlist(strsplit(Sys.getenv(c(\"REL_FILES\")), \"\\n\")); \
+          files <- unlist(strsplit(Sys.getenv(c(\"REL_FILES\")), \",\")); \
           for(f in files) { \
               insertPackage(f, \
                   repodir = './drat', \

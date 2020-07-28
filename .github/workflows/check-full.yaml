@@ -129,15 +129,16 @@ jobs:
 
       - name: Check latest number of release files
         run: |
-          export NUM_REL_FILES=$(curl -s https://api.github.com/repos/redus-imr/gadget/releases/latest \
+          COUNT=$(curl -s https://api.github.com/repos/redus-imr/gadget/releases/latest \
           | grep browser_download_url \
           | grep gadgetr \
           | cut -d '"' -f4 \
           | wc -l)
+          echo "::set-env name=NUM_REL::${COUNT}"
         shell: bash
 
       - name: Last release has been uploaded - release it
-        if: env.NUM_REL_FILES == '5'
+        if: env.NUM_REL == '5'
         uses: ncipollo/release-action@v1
         with:
           draft: false
