@@ -115,7 +115,7 @@ jobs:
           cat(paste0("::set-env name=PKG_VER::", pkgver, "\n"))
         shell: Rscript {0}
 
-      - name: Create release and upload files
+      - name: Create draft release and upload files
         if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
         uses: ncipollo/release-action@v1
         with:
@@ -125,4 +125,23 @@ jobs:
           tag: ${{ env.PKG_VER }}
           name: Release-v${{ env.PKG_VER }}
           artifacts: ${{ github.workspace }}/${{ env.PKG_FREL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check latest number of release files
+        run: |
+          export NUM_REL_FILES=$(curl -s https://api.github.com/repos/redus-imr/gadget/releases/latest \
+          | grep browser_download_url \
+          | grep gadgetr \
+          | cut -d '"' -f4 \
+          | wc -l)
+
+      - name: Last release has been uploaded - release it
+        if: env.NUM_REL_FILES == '5'
+        uses: ncipollo/release-action@v1
+        with:
+          draft: false
+          allowUpdates: true
+          commit: gadgetr
+          tag: ${{ env.PKG_VER }}
+          name: Release-v${{ env.PKG_VER }}
           token: ${{ secrets.GITHUB_TOKEN }}
