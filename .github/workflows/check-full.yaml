@@ -90,7 +90,7 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ runner.os }}-${{ matrix.config.r }}-results
           path: check
@@ -134,6 +134,7 @@ jobs:
           | grep gadgetr \
           | cut -d '"' -f4 \
           | wc -l)
+        shell: bash
 
       - name: Last release has been uploaded - release it
         if: env.NUM_REL_FILES == '5'
