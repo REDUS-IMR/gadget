@@ -1,0 +1,8 @@
+Package: gadgetr
+Version: 0.9.0
+Imports: Rcpp (>= 0.12.13), methods
+LinkingTo: Rcpp
+Suggests: testthat, knitr, rmarkdown
+License: GPL-2
+MD5sum: 2df90e48e956928122856152c65fe828
+NeedsCompilation: yes
