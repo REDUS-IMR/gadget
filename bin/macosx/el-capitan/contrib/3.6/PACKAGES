@@ -4,4 +4,4 @@ Imports: Rcpp (>= 0.12.13), methods
 LinkingTo: Rcpp
 Suggests: testthat, knitr, rmarkdown
 License: GPL-2
-MD5sum: 9a854265e91725a0f5b16f34384c0add
+MD5sum: 116e7d623e8283d2fd810b48896222c2
