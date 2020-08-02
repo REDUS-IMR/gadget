@@ -34,6 +34,8 @@ Description: Gadget program <https://github.com/Hafro/gadget2> re-packaged as
 License: GPL-2
 Imports:
     Rcpp (>= 0.12.13),
+    dplyr,
+    FLCore,
     methods
 LinkingTo: Rcpp
 RoxygenNote: 7.1.0
