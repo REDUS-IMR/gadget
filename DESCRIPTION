@@ -43,6 +43,11 @@ Encoding: UTF-8
 Suggests: 
     testthat,
     knitr,
-    rmarkdown
+    rmarkdown,
+    FLBRP,
+    FLash,
+    ggplotFL,
+    parallel
+Additional_repositories: https://flr-project.org/R/
 VignetteBuilder: knitr
 Biarch: true
