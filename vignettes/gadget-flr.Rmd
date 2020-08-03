@@ -213,12 +213,17 @@ library(parallel)
 library(FLCore)
 library(ggplotFL)
 
-cores <- detectCores()
+chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
 
-if(is.na(cores))
-  cores <- 4
+if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores in CRAN/actions
+    num_workers <- 2L
+} else {
+    # use all cores in devtools::test()
+    num_workers <- detectCores()
+}
 
-cl <- makeCluster(detectCores(), type = "PSOCK")
+cl <- makeCluster(num_workers, type = "PSOCK")
 
 params <- parameterize()
 
