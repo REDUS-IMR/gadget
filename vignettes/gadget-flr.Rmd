@@ -150,10 +150,10 @@ predict_TAC <- function(year, stk, idx, srmodel) {
 
 runHadSingle <- function(params, modelsel) {
 
-  library(gadgetr)
   library(FLCore)
   library(FLBRP)
   library(FLash)
+  library(gadgetr)
 
 	# Clean any prior gadget run
 	endGadget()
