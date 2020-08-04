@@ -70,6 +70,11 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
+      - name: Install gadgetr in Windows (for vignettes)
+        if: runner.os == 'Windows'
+        run: |
+          Rscript -e "remotes::install_github('REDUS-IMR/gadget', ref='gadgetr')"
+
       - name: Session info
         run: |
           options(width = 100)
@@ -128,6 +133,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check latest number of release files
+        if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
         run: |
           COUNT=$(curl -s https://api.github.com/repos/redus-imr/gadget/releases/tags/v${PKG_VER} \
           | grep browser_download_url \
@@ -136,7 +142,7 @@ jobs:
         shell: bash
 
       - name: Last release has been uploaded - release it
-        if: env.NUM_REL == '5'
+        if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr' && env.NUM_REL == '5'
         uses: ncipollo/release-action@v1
         with:
           prerelease: false
