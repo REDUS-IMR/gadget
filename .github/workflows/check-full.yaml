@@ -73,7 +73,7 @@ jobs:
       - name: Install gadgetr in Windows (for vignettes)
         if: runner.os == 'Windows'
         run: |
-          Rscript -e "remotes::install_github('REDUS-IMR/gadget', ref='gadgetr')"
+          Rscript -e "remotes::install_local('.')"
 
       - name: Session info
         run: |
@@ -101,7 +101,7 @@ jobs:
           path: check
 
       - name: Build package source archive
-        if: runner.os == 'Linux' && matrix.config.r == 'release' && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
+        if: runner.os == 'Linux' && matrix.config.r == 'release' && github.event_name == 'push'
         run: |
           file <- pkgbuild::build(".", dest_path = ".", binary = FALSE)
           pkgver <- tail(unlist(strsplit(tools::file_path_sans_ext(file, compression = TRUE), "_")), 1)
@@ -110,7 +110,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Build package binary archive
-        if: (runner.os == 'Windows' || runner.os == 'macOS') && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
+        if: (runner.os == 'Windows' || runner.os == 'macOS') && github.event_name == 'push'
         run: |
           file <- pkgbuild::build(".", dest_path = ".", binary = TRUE)
           pkgver <- tail(unlist(strsplit(tools::file_path_sans_ext(file, compression = TRUE), "_")), 1)
@@ -120,11 +120,10 @@ jobs:
           cat(paste0("::set-env name=PKG_VER::", pkgver, "\n"))
         shell: Rscript {0}
 
-      - name: Create draft release and upload files
-        if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
+      - name: Create release and upload files
+        if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push'
         uses: ncipollo/release-action@v1
         with:
-          prerelease: true
           allowUpdates: true
           commit: gadgetr
           tag: v${{ env.PKG_VER }}
@@ -132,22 +131,49 @@ jobs:
           artifacts: ${{ github.workspace }}/${{ env.PKG_FREL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check latest number of release files
-        if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr'
-        run: |
-          COUNT=$(curl -s https://api.github.com/repos/redus-imr/gadget/releases/tags/v${PKG_VER} \
-          | grep browser_download_url \
-          | grep gadgetr -c)
-          echo "::set-env name=NUM_REL::${COUNT}"
-        shell: bash
-
-      - name: Last release has been uploaded - release it
-        if: (runner.os == 'Windows' || runner.os == 'macOS' || (runner.os == 'Linux' && matrix.config.r == 'release')) && github.event_name == 'push' && github.ref == 'refs/heads/gadgetr' && env.NUM_REL == '5'
-        uses: ncipollo/release-action@v1
+  DRAT-deploy:
+    needs: R-CMD-check
+    runs-on: ubuntu-18.04
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          prerelease: false
-          allowUpdates: true
-          commit: gadgetr
-          tag: v${{ env.PKG_VER }}
-          name: Release-v${{ env.PKG_VER }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: 'gh-pages'
+          path: 'drat'
+
+      - uses: r-lib/actions/setup-r@master
+
+      - name: Install dependencies
+        run: |
+          install.packages('drat')
+        shell: Rscript {0}
+
+      - name: Download release files
+        run: |
+          ## Download release assets
+          curl -s https://api.github.com/repos/redus-imr/gadget/releases/latest \
+          | grep browser_download_url \
+          | grep gadgetr \
+          | cut -d '"' -f4 \
+          | wget -qi -
+          echo "::set-env name=REL_FILES::$(ls gadgetr* | tr '\n' ',')"
+
+      - name: Add files
+        run: |
+          Rscript -e "library(drat); \
+          files <- unlist(strsplit(Sys.getenv(c(\"REL_FILES\")), \",\")); \
+          for(f in files) { \
+              insertPackage(f, \
+                  repodir = './drat', \
+                  commit = FALSE) \
+          }"
+
+      - name: Push back repo
+        run: |
+          cd drat
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "Setup DRAT"
+          git push
