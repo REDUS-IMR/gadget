@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gadgetr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.1</span>
       </span>
     </div>
 
@@ -54,6 +54,9 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/gadget-flr.html">GadgetR: Gadget and FLR Example</a>
+    </li>
+    <li>
       <a href="../articles/quickstart.html">GadgetR: Quick Start Guide</a>
     </li>
     <li>
@@ -78,7 +81,7 @@
       <h1 data-toc-skip>GadgetR: Quick Start Guide</h1>
                         <h4 class="author">Ibrahim Umar</h4>
             
-            <h4 class="date">2020-07-28</h4>
+            <h4 class="date">2020-08-05</h4>
       
       
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -112,16 +115,16 @@
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># Get the path of the example haddock data</span>
 <span class="no">exPath</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loadExample.html">loadExample</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">exPath</span>)
-<span class="co">#&gt; [1] "/Users/runner/work/_temp/Library/gadgetr/extdata/haddock"</span></pre></body></html></div>
+<span class="co">#&gt; [1] "/home/runner/work/_temp/Library/gadgetr/extdata/haddock"</span></pre></body></html></div>
 <p>To initialize a gadget run, we have to specify the full path of the model and also the input file. In the example model, the input file is the file named <code>refinputfile</code>.</p>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Init the haddock model</span>
 <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="no">exPath</span>, <span class="st">"refinputfile"</span>)
-<span class="co">#&gt; Gadget version 2.2.00-BETA running on Mac-1595965780720 Tue Jul 28 20:02:21 2020</span>
-<span class="co">#&gt; Starting Gadget from directory: /Users/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
-<span class="co">#&gt; using data from directory: /Users/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
+<span class="co">#&gt; Gadget version 2.2.00-BETA running on fv-az19 Wed Aug  5 10:54:01 2020</span>
+<span class="co">#&gt; Starting Gadget from directory: /home/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
+<span class="co">#&gt; using data from directory: /home/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Finished reading model data files, starting to run simulation</span>
-<span class="co">#&gt; [1] "Gadget is started with the given model in /Users/runner/work/_temp/Library/gadgetr/extdata/haddock."</span>
+<span class="co">#&gt; [1] "Gadget is started with the given model in /home/runner/work/_temp/Library/gadgetr/extdata/haddock."</span>
 <span class="co">#&gt; NULL</span></pre></body></html></div>
 <p>The <code><a href="../reference/initGadget.html">initGadget()</a></code> function instructs gadget to load the model and preparing the internal data structure. If successful, the model is now ready to be run.</p>
 </div>
