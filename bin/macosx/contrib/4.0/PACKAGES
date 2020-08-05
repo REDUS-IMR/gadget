@@ -10,6 +10,7 @@ Package: gadgetr
 Version: 0.9.1
 Imports: Rcpp (>= 0.12.13), dplyr, FLCore, methods
 LinkingTo: Rcpp
-Suggests: testthat, knitr, rmarkdown, FLBRP, FLash, ggplotFL, parallel
+Suggests: testthat, knitr, pkgdown, rmarkdown, FLBRP, FLash, ggplotFL,
+        parallel
 License: GPL-2
-MD5sum: a0381511e42befa85c3b1ff87f6755b6
+MD5sum: 48bcc5b93b49b9565a0ed03c2176236f
