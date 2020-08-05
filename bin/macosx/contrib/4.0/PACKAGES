@@ -5,3 +5,11 @@ LinkingTo: Rcpp
 Suggests: testthat, knitr, rmarkdown, FLBRP, FLash, ggplotFL, parallel
 License: GPL-2
 MD5sum: 4532d3da46aa187eae1ce37f4898272d
+
+Package: gadgetr
+Version: 0.9.1
+Imports: Rcpp (>= 0.12.13), dplyr, FLCore, methods
+LinkingTo: Rcpp
+Suggests: testthat, knitr, rmarkdown, FLBRP, FLash, ggplotFL, parallel
+License: GPL-2
+MD5sum: a0381511e42befa85c3b1ff87f6755b6
