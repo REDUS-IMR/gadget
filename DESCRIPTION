@@ -43,6 +43,7 @@ Encoding: UTF-8
 Suggests: 
     testthat,
     knitr,
+    pkgdown,
     rmarkdown,
     FLBRP,
     FLash,
