@@ -164,10 +164,10 @@ jobs:
           Rscript -e "library(drat); \
           files <- unlist(strsplit(Sys.getenv(c(\"REL_FILES\")), \",\")); \
           for(f in files) { \
-              pre <- head(unlist(strsplit(f, "-")), 1); \
-              ext <- tail(unlist(strsplit(tail(unlist(strsplit(f, "-")), 1), "[.]")), -1); \
-              tgt <- paste0(pre, ".", ext); \
-              file.move(f, tgt); \
+              pre <- head(unlist(strsplit(tools::file_path_sans_ext(f, compression = T), \"-\")), 1); \
+              ext <- tail(unlist(strsplit(f, tools::file_path_sans_ext(f, compression = T))), 1); \
+              tgt <- paste0(pre, ext); \
+              file.rename(f, tgt); \
               insertPackage(tgt, \
                   repodir = './drat', \
                   commit = FALSE); \
