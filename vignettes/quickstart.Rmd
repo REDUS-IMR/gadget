@@ -20,14 +20,20 @@ knitr::opts_chunk$set(
 ```
 # Installing the package
 
-As for now, the package is yet to find its way into CRAN. Therefore, you can
-download and install from the pre-compiled binaries here:
+As for now, the package is yet to find its way into CRAN. However, you can use
+our alternative repo that enables you to use R's ```install.packages()```:
+
+```
+install.packages("gadgetr", repos = "https://redus-imr.github.io/gadget")
+```
+
+Or, you can download and install from the pre-compiled binaries here:
 
 ```
 https://github.com/REDUS-IMR/gadget/releases/latest
 ```
 
-Or, you might want to compile it from the source in Github:
+Or, you might want to compile it from the source available in Github:
 
 ```{r eval=FALSE}
 devtools::install_github("REDUS-IMR/gadget", ref="gadgetr")
