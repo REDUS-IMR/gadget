@@ -81,7 +81,7 @@
       <h1 data-toc-skip>GadgetR: Quick Start Guide</h1>
                         <h4 class="author">Ibrahim Umar</h4>
             
-            <h4 class="date">2020-08-05</h4>
+            <h4 class="date">2020-08-06</h4>
       
       
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -93,10 +93,12 @@
 <div id="installing-the-package" class="section level1">
 <h1 class="hasAnchor">
 <a href="#installing-the-package" class="anchor"></a>Installing the package</h1>
-<p>As for now, the package is yet to find its way into CRAN. Therefore, you can download and install from the pre-compiled binaries here:</p>
+<p>As for now, the package is yet to find its way into CRAN. However, you can use our alternative repo that enables you to use R’s <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages()</a></code>:</p>
+<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("gadgetr", repos = "https://redus-imr.github.io/gadget")</a></code></pre>
+<p>Or, you can download and install from the pre-compiled binaries here:</p>
 <pre><code>https://github.com/REDUS-IMR/gadget/releases/latest</code></pre>
-<p>Or, you might want to compile it from the source in Github:</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"REDUS-IMR/gadget"</span>, <span class="kw">ref</span><span class="kw">=</span><span class="st">"gadgetr"</span>)</pre></body></html></div>
+<p>Or, you might want to compile it from the source available in Github:</p>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"REDUS-IMR/gadget"</span>, <span class="kw">ref</span><span class="kw">=</span><span class="st">"gadgetr"</span>)</pre></body></html></div>
 </div>
 <div id="running-the-sample-haddock-model" class="section level1">
 <h1 class="hasAnchor">
@@ -106,20 +108,20 @@
 <h2 class="hasAnchor">
 <a href="#loading-the-package" class="anchor"></a>Loading the package</h2>
 <p>After installing, the following command will load the library.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gadgetr</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gadgetr</span>)</pre></body></html></div>
 </div>
 <div id="loading-the-example-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#loading-the-example-model" class="anchor"></a>Loading the example model</h2>
 <p>The library ships with an example haddock model. What we need to do is calling <code><a href="../reference/loadExample.html">loadExample()</a></code> to obtain the full path of the model.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="co"># Get the path of the example haddock data</span>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Get the path of the example haddock data</span>
 <span class="no">exPath</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loadExample.html">loadExample</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">exPath</span>)
 <span class="co">#&gt; [1] "/home/runner/work/_temp/Library/gadgetr/extdata/haddock"</span></pre></body></html></div>
 <p>To initialize a gadget run, we have to specify the full path of the model and also the input file. In the example model, the input file is the file named <code>refinputfile</code>.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Init the haddock model</span>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># Init the haddock model</span>
 <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="no">exPath</span>, <span class="st">"refinputfile"</span>)
-<span class="co">#&gt; Gadget version 2.2.00-BETA running on fv-az58 Wed Aug  5 14:10:57 2020</span>
+<span class="co">#&gt; Gadget version 2.2.00-BETA running on fv-az64 Thu Aug  6 17:55:44 2020</span>
 <span class="co">#&gt; Starting Gadget from directory: /home/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
 <span class="co">#&gt; using data from directory: /home/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
 <span class="co">#&gt; </span>
@@ -132,7 +134,7 @@
 <h2 class="hasAnchor">
 <a href="#printing-the-model-ecosystem-information" class="anchor"></a>Printing the model ecosystem information</h2>
 <p>Now that the model is loaded, we might want to inspect some of the important objects in the simulation. The <code><a href="../reference/getEcosystemInfo.html">getEcosystemInfo()</a></code> is a useful function that provides this type of information.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># Get the initial information</span>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co"># Get the initial information</span>
 <span class="no">initial</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">initial</span>)
 <span class="co">#&gt; $fleet</span>
@@ -163,7 +165,7 @@
 <a href="#moving-the-simulation-forward" class="anchor"></a>Moving the simulation forward</h2>
 <p>As we can see in the previous section, the sample haddock model has a certain number of simulation steps. Now let’s loop through the time steps while collecting the important metrics from the fleets and the stocks.</p>
 <p>The package provides two alternative functions to forward the simulation time. These functions are <code><a href="../reference/runStep.html">runStep()</a></code> and <code><a href="../reference/runYear.html">runYear()</a></code>, which forward the simulation by a step and a year, respectively. Both functions returns the metrics from both stocks and fleets objects at that particular step or year.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co"># Variable for counting step</span>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Variable for counting step</span>
 <span class="no">lengthStep</span> <span class="kw">&lt;-</span> <span class="fl">1</span>
 
 <span class="co"># Loop for all steps</span>
@@ -205,7 +207,7 @@
 <a href="#inspecting-the-simulation-output" class="anchor"></a>Inspecting the simulation output</h2>
 <p>The greatest advantage of this package is its ability to extract and modify information directly from/to the gadget’s internal runtime objects in memory. This will save user from tinkering with the gadget model configuration files and also it output printing files.</p>
 <p>This guide won’t cover the on-the-fly modification of a gagdet internal objects. However, the code below should demonstrates the package ability on gadget information extraction.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Print out all status</span>
+<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># Print out all status</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]))
 <span class="co">#&gt; [1] "fleets" "stocks"</span>
 <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>))
@@ -257,7 +259,7 @@
 <h2 class="hasAnchor">
 <a href="#terminating-the-model-run" class="anchor"></a>Terminating the model run</h2>
 <p>After each simulation, it is necessary for user to properly terminate an active gadget simulation run. Use the code below after you finished with a simulation run or if you want to restart the current model or loading a new model.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># Sim cleanup</span>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># Sim cleanup</span>
 <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/endGadget.html">endGadget</a></span>()
 <span class="co">#&gt; [1] "Gadget succesfully terminates."</span>
 <span class="co">#&gt; NULL</span></pre></body></html></div>
