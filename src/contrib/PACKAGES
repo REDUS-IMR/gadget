@@ -14,5 +14,5 @@ LinkingTo: Rcpp
 Suggests: testthat, knitr, pkgdown, rmarkdown, FLBRP, FLash, ggplotFL,
         parallel
 License: GPL-2
-MD5sum: fb7bb001d57da9e2cb177bb7dfcb92aa
+MD5sum: 6771051f84c355e6508a5987b169dd7e
 NeedsCompilation: yes

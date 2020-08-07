@@ -22,4 +22,4 @@ LinkingTo: Rcpp
 Suggests: testthat, knitr, pkgdown, rmarkdown, FLBRP, FLash, ggplotFL,
         parallel
 License: GPL-2
-MD5sum: b40696792ffbb0a410bbdb620d21a5f5
+MD5sum: 1262c210a0c2549b41903da4c6fb1681
