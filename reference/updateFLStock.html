@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Update a total fleet catch amount — updateAmount • gadgetr</title>
+<title>Update FLStock and FLIndex objects using a gadget simulation run output — updateFLStock • gadgetr</title>
 
 
 <!-- jquery -->
@@ -39,8 +39,9 @@
 
 
 
-<meta property="og:title" content="Update a total fleet catch amount — updateAmount" />
-<meta property="og:description" content="This function updates the catch amount of a totalfleet object." />
+<meta property="og:title" content="Update FLStock and FLIndex objects using a gadget simulation run output — updateFLStock" />
+<meta property="og:description" content="This function translates a gadget output object for a given gadgetYear 
+year and stockTitle stock and inserts it to the FLR objects (fl_stock and fl_index)." />
 
 
 
@@ -121,59 +122,49 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Update a total fleet catch amount</h1>
+    <h1>Update FLStock and FLIndex objects using a gadget simulation run output</h1>
     
-    <div class="hidden name"><code>updateAmount.Rd</code></div>
+    <div class="hidden name"><code>updateFLStock.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>This function updates the catch amount of a totalfleet object.</p>
+    <p>This function translates a gadget output object for a given <code>gadgetYear</code> 
+year and <code>stockTitle</code> stock and inserts it to the FLR objects (<code>fl_stock</code> and <code>fl_index</code>).</p>
     </div>
 
-    <pre class="usage"><span class='fu'>updateAmount</span>(<span class='no'>fleetName</span>, <span class='no'>year</span>, <span class='no'>step</span>, <span class='no'>area</span>, <span class='no'>value</span>)</pre>
+    <pre class="usage"><span class='fu'>updateFLStock</span>(<span class='no'>stockTitle</span>, <span class='no'>out</span>, <span class='no'>gadgetYear</span>, <span class='no'>fl_stock</span>, <span class='no'>fl_index</span>, <span class='no'>globalparams</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>fleetName</th>
-      <td><p>a string of the fleet name</p></td>
+      <th>stockTitle</th>
+      <td><p>a string of gadget stock name</p></td>
     </tr>
     <tr>
-      <th>year</th>
-      <td><p>a target year</p></td>
+      <th>out</th>
+      <td><p>gadget simulation output object. Normally is the output of [runYear()]</p></td>
     </tr>
     <tr>
-      <th>step</th>
-      <td><p>a target step</p></td>
+      <th>gadgetYear</th>
+      <td><p>gadget year target</p></td>
     </tr>
     <tr>
-      <th>area</th>
-      <td><p>a target area</p></td>
+      <th>fl_stock</th>
+      <td><p>an existing FLStock object. Normally produced by [runUntil()]</p></td>
     </tr>
     <tr>
-      <th>value</th>
-      <td><p>the target amount</p></td>
+      <th>fl_index</th>
+      <td><p>an existing FLIndex object. Normally produced by [runUntil()]</p></td>
+    </tr>
+    <tr>
+      <th>globalparams</th>
+      <td><p>a list object of parameters to aid gadget to FLR objects generation (See this page
+<code><a href='../articles/gadget-flr.html'>vignette("gadget-flr", package = "gadgetr")</a></code> for an example)</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a vector of numeric error codes (0 is success, otherwise is error)</p>
-
-    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>if</span>(<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()){
- <span class='no'>exPath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loadExample.html'>loadExample</a></span>()
- <span class='fu'><a href='initGadget.html'>initGadget</a></span>(<span class='no'>exPath</span>, <span class='st'>"refinputfile"</span>)
- <span class='fu'>updateAmount</span>(<span class='st'>"future"</span>, <span class='fl'>1978</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>123456</span>)
- <span class='fu'>updateAmount</span>(<span class='st'>"future"</span>, <span class='fl'>1978</span>, <span class='fl'>3</span>, <span class='fl'>1</span>, <span class='fl'>567890</span>)
- <span class='no'>stat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='runStep.html'>runStep</a></span>()
- <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>stat</span>$<span class='no'>fleets</span>$<span class='no'>future</span>$<span class='no'>catch</span>$<span class='no'>had</span>[, <span class='st'>"biomassConsumed"</span>]))
- <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/aggregate.html'>aggregate</a></span>(<span class='no'>biomassConsumed</span> ~ <span class='no'>year</span> + <span class='no'>step</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>stat</span>$<span class='no'>fleets</span>$<span class='no'>future</span>$<span class='no'>catch</span>$<span class='no'>had</span>, <span class='kw'>FUN</span><span class='kw'>=</span><span class='no'>sum</span>))
- <span class='fu'><a href='endGadget.html'>endGadget</a></span>()
- }
-}</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

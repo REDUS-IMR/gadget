@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gadgetr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.2</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
       <h1 data-toc-skip>GadgetR: Gadget and FLR Example</h1>
                         <h4 class="author">Ibrahim Umar</h4>
             
-            <h4 class="date">2020-08-06</h4>
+            <h4 class="date">2020-08-18</h4>
       
       
       <div class="hidden name"><code>gadget-flr.Rmd</code></div>
@@ -235,7 +235,7 @@
     <span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="no">exPath</span>, <span class="st">"refinputfile"</span>)
 
     <span class="co"># Run the hindcast period</span>
-    <span class="no">gadgetFLR</span> <span class="kw">&lt;-</span> <span class="fu">runUntil</span>(<span class="no">params</span><span class="kw">[[</span><span class="st">"projYear"</span>]] - <span class="fl">1</span>, <span class="no">params</span>)
+    <span class="no">gadgetFLR</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/runUntil.html">runUntil</a></span>(<span class="no">params</span><span class="kw">[[</span><span class="st">"projYear"</span>]] - <span class="fl">1</span>, <span class="no">params</span>)
 
   <span class="no">yrList</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">params</span><span class="kw">[[</span><span class="st">"projYear"</span>]]:<span class="no">params</span><span class="kw">[[</span><span class="st">"finalYear"</span>]])
 
@@ -269,7 +269,7 @@
       <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/window.html">window</a></span>(<span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">year</span>)
       <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/window.html">window</a></span>(<span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">year</span>)
 
-      <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]] <span class="kw">&lt;-</span> <span class="fu">updateFLStock</span>(<span class="no">sp</span>, <span class="no">out</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">year</span>),
+      <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/updateFLStock.html">updateFLStock</a></span>(<span class="no">sp</span>, <span class="no">out</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">year</span>),
           <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span>, <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span>, <span class="no">params</span>)
     }
     }
