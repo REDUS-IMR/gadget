@@ -1,4 +1,13 @@
-# Helper function
+#' @title Update FLStock and FLIndex objects using a gadget simulation run output
+#' @description This function translates a gadget output object for a given \code{gadgetYear} 
+#' year and \code{stockTitle} stock and inserts it to the FLR objects (\code{fl_stock} and \code{fl_index}).
+#' @param stockTitle a string of gadget stock name
+#' @param out gadget simulation output object. Normally is the output of [runYear()]
+#' @param gadgetYear gadget year target
+#' @param fl_stock an existing FLStock object. Normally produced by [runUntil()]
+#' @param fl_index an existing FLIndex object. Normally produced by [runUntil()]
+#' @param globalparams a list object of parameters to aid gadget to FLR objects generation (See this page
+#' \code{vignette("gadget-flr", package = "gadgetr")} for an example)
 #' @importFrom dplyr anti_join
 #' @importFrom FLCore window catch.n<- stock.n<- index<- catch<- catch.wt<- 
 #' discards discards<- discards.n discards.n<- discards.wt discards.wt<-
@@ -277,7 +286,12 @@ updateFLStock <- function(stockTitle, out, gadgetYear, fl_stock, fl_index, globa
 }
 
 
-# Instruct gadget to run until a specific year
+#' @title Instruct gadget to run until a specific year and produces FLR stock and index objects
+#' @description This function runs gadget until a specified year and automatically generate two 
+#' FLR objects (FLStock and FLIndex) for each available stocks from the gadget run.
+#' @param until end year of the simulation
+#' @param globalparams a list object of parameters to aid gadget to FLR objects generation (See this page
+#' \code{vignette("gadget-flr", package = "gadgetr")} for an example)
 #' @importFrom FLCore FLStock FLQuant FLIndex expand units<-
 #' catch catch.n catch.wt stock stock.n stock.wt
 #' @export
