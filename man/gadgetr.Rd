@@ -10,3 +10,4 @@ Gadget program (https://github.com/Hafro/gadget) re-packaged as an R package
 \author{
 Ibrahim Umar
 }
+\keyword{internal}

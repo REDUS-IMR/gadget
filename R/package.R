@@ -8,4 +8,5 @@
 #' @importFrom Rcpp evalCpp
 #' @useDynLib gadgetr
 #' @name gadgetr
+#' @keywords internal
 NULL
