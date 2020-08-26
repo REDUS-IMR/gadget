@@ -155,22 +155,21 @@ runHadSingle <- function(params, modelsel) {
   library(FLash)
   library(gadgetr)
 
-	# Clean any prior gadget run
-	endGadget()
+  # Clean any prior gadget run
+  endGadget()
 
-	# Get the path of the example haddock data
-	exPath <- loadExample()
+  # Get the path of the example haddock data
+  exPath <- loadExample()
 
-	# Init the haddock model
-	initGadget(exPath, "refinputfile")
+  # Init the haddock model
+  initGadget(exPath, "refinputfile")
 
-	# Run the hindcast period
-	gadgetFLR <- runUntil(params[["projYear"]] - 1, params)
+  # Run the hindcast period
+  gadgetFLR <- runUntil(params[["projYear"]] - 1, params)
 
   yrList <- c(params[["projYear"]]:params[["finalYear"]])
 
-	for(year in yrList) {
-		print(year)
+  for(year in yrList) {
 
     # Loop through unique stocks
     for(sp in params$stockList) {
@@ -232,8 +231,7 @@ clusterExport(cl, c("runHadSingle", "predict_TAC",
                       "predict_recruitment", "params"))
 
 # Try to run with many different recruitment models in parallel
-models <- c(bevholt, ricker, cushing, geomean, segreg, shepherd, bevholtAR1,
-            rickerAR1, segregAR1)
+models <- c(bevholt, ricker, geomean, segreg, bevholtAR1, rickerAR1, segregAR1)
 result <- parLapply(cl, models, function(x) runHadSingle(params, x))
 
 stopCluster(cl)
