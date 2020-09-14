@@ -3,7 +3,7 @@
 ;
 timefile    time        ; specifying years 1978-2020
 areafile    area        ; specifying only one area
-printfiles  printfile   ; specifying the printer classes
+printfiles  ;printfile   ; specifying the printer classes
 ;
 [stock]          ; the description of the stock data
 stockfiles       had
