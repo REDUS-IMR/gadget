@@ -45,7 +45,9 @@ This guide demonstrates gadgetr’s capability of controlling a gadget model run
 and extracting relevant information during the run. To run simulations,
 GadgetR requires a gadget model as ‘input’ (normally a set of text files). In
 this tutorial, we demonstrate how you set up and run GadgetR simulations using
-a simple haddock model by James Begley (link or ref).
+a simple haddock
+[model](https://github.com/Hafro/gadget2/blob/master/examples/haddock.md)
+by James Begley.
 
 ## Loading the package
 
