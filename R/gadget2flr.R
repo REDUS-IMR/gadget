@@ -12,7 +12,7 @@
 #' @importFrom FLCore window catch.n<- stock.n<- index<- catch<- catch.wt<- 
 #' discards discards<- discards.n discards.n<- discards.wt discards.wt<-
 #' landings landings<- landings.n landings.n<- landings.wt landings.wt<-
-#' stock<- stock.wt<- m m<- harvest harvest<- range<- 
+#' stock<- stock.wt<- m m<- harvest harvest<- mat mat<- range<-
 #' @importFrom stats aggregate
 #' @export
 updateFLStock <- function(stockTitle, out, gadgetYear, fl_stock, fl_index, globalparams) {
