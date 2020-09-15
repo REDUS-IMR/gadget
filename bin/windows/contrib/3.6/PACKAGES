@@ -32,3 +32,12 @@ Suggests: testthat, knitr, pkgdown, rmarkdown, FLBRP, FLash, ggplotFL,
         parallel
 License: GPL-2
 Archs: i386, x64
+
+Package: gadgetr
+Version: 0.9.3
+Imports: Rcpp (>= 0.12.13), dplyr, FLCore, methods
+LinkingTo: Rcpp
+Suggests: testthat, knitr, pkgdown, rmarkdown, FLBRP, FLash, ggplotFL,
+        parallel, ggplot2, Hmisc
+License: GPL-2
+Archs: i386, x64
