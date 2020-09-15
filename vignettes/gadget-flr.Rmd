@@ -146,27 +146,27 @@ object. This function utilizes FLR's FLSR tool.
 # Predict recruitment
 predict_recruitment <- function(stk, model) {
 
-	# Create the model
-	newFL <- fmle(as.FLSR(stk, model=model))
+    # Create the model
+    newFL <- fmle(as.FLSR(stk, model=model))
 
-	# Get the latest ssb
-	ssb <- tail(ssb(stk), 1)
+    # Get the latest ssb
+    ssb <- tail(ssb(stk), 1)
 
-	# Predict
-  prm <- params(newFL)
+    # Predict
+    prm <- params(newFL)
 
-	s <- a <- prm[[1]] # Extract 'a' parameter
+    s <- a <- prm[[1]] # Extract 'a' parameter
 
-  if(length(prm) > 1)
-	  R0 <- b <- params(newFL)[[2]] # Extract 'b' parameter
+    if(length(prm) > 1)
+        R0 <- b <- params(newFL)[[2]] # Extract 'b' parameter
 
-  if(length(prm) > 2)
-	  v <- c <- params(newFL)[[3]] # Extract 'c' parameter
+    if(length(prm) > 2)
+        v <- c <- params(newFL)[[3]] # Extract 'c' parameter
 
-	# Use the model formula in FLCore
-	rec <- eval(parse(text = as.character(model()$model[3])))
+    # Use the model formula in FLCore
+    rec <- eval(parse(text = as.character(model()$model[3])))
 
-	return(list(srmodel = newFL, rec = as.numeric(rec)))
+    return(list(srmodel = newFL, rec = as.numeric(rec)))
 }
 ```
 
@@ -180,39 +180,38 @@ object. This function utilizes FLR's FLBRP object.
 # Predict TAC (no assessment, using real data)
 predict_TAC <- function(year, stk, idx, srmodel) {
 
-  # Cherry-picked from: https://flr-project.org/doc/An_introduction_to_MSE_using_FLR.html
-  # Year needs to be carefully checked
+    # Cherry-picked from: https://flr-project.org/doc/An_introduction_to_MSE_using_FLR.html
+    # Year needs to be carefully checked
+    getCtrl <- function(values, quantity, years, it){
+        dnms <- list(iter=1:it, year=years, c("min", "val", "max"))
+        arr0 <- array(NA, dimnames=dnms, dim=unlist(lapply(dnms, length)))
+        arr0[,,"val"] <- unlist(values)
+        arr0 <- aperm(arr0, c(2,3,1))
+        ctrl <- fwdControl(data.frame(year=years, quantity=quantity, val=NA))
+        ctrl@trgtArray <- arr0
+        ctrl
+    }
 
-  getCtrl <- function(values, quantity, years, it){
-      dnms <- list(iter=1:it, year=years, c("min", "val", "max"))
-      arr0 <- array(NA, dimnames=dnms, dim=unlist(lapply(dnms, length)))
-      arr0[,,"val"] <- unlist(values)
-      arr0 <- aperm(arr0, c(2,3,1))
-      ctrl <- fwdControl(data.frame(year=years, quantity=quantity, val=NA))
-      ctrl@trgtArray <- arr0
-      ctrl
-  }
+    brp <- brp(FLBRP(stk, srmodel))
+    Fmsy <- c(refpts(brp)["msy","harvest"])
+    msy <- c(refpts(brp)["msy","yield"])
+    Bmsy <- c(refpts(brp)["msy","ssb"])
+    Bpa <- 0.5 * Bmsy
+    Blim <- Bpa / 1.4
 
-  brp <- brp(FLBRP(stk, srmodel))
-  Fmsy <- c(refpts(brp)["msy","harvest"])
-  msy <- c(refpts(brp)["msy","yield"])
-  Bmsy <- c(refpts(brp)["msy","ssb"])
-  Bpa <- 0.5 * Bmsy
-  Blim <- Bpa / 1.4
+    flag <- ssb(stk)[, as.character(year - 1)] < Bpa
+    Ftrgt <- ifelse(flag, ssb(stk)[, as.character(year - 1)] * Fmsy / Bpa, Fmsy)
 
-  flag <- ssb(stk)[, as.character(year - 1)] < Bpa
-  Ftrgt <- ifelse(flag, ssb(stk)[, as.character(year - 1)] * Fmsy / Bpa, Fmsy)
+    sqy <- as.character(c((year - 3):(year-1)))
+    fsq <- yearMeans(fbar(stk)[, sqy]) # Use status quo
+    ctrl <- getCtrl(c(fsq, Ftrgt), "f", c(year, year + 1), 1)
+    stk <- stf(stk, 2)
+    gmean_rec <- c(exp(yearMeans(log(rec(stk)))))
+    stk <- fwd(stk, control=ctrl, sr=list(model="mean", params = FLPar(gmean_rec,iter=1)))
 
-  sqy <- as.character(c((year - 3):(year-1)))
-  fsq <- yearMeans(fbar(stk)[, sqy]) # Use status quo
-  ctrl <- getCtrl(c(fsq, Ftrgt), "f", c(year, year + 1), 1)
-  stk <- stf(stk, 2)
-  gmean_rec <- c(exp(yearMeans(log(rec(stk)))))
-  stk <- fwd(stk, control=ctrl, sr=list(model="mean", params = FLPar(gmean_rec,iter=1)))
+    TAC <- catch(stk)[, as.character(year)]
 
-  TAC <- catch(stk)[, as.character(year)]
-
-	return(TAC)
+    return(TAC)
 }
 ```
 ## The main MSE loop code
@@ -224,62 +223,58 @@ object from the FLCore package (e.g., `bevholt`, `ricker`).
 ```{r}
 runHadSingle <- function(params, modelsel) {
 
-  library(FLCore)
-  library(FLBRP)
-  library(FLash)
-  library(gadgetr)
+    library(FLCore)
+    library(FLBRP)
+    library(FLash)
+    library(gadgetr)
 
-	# Clean any prior gadget run
-	endGadget()
+    # Clean any prior gadget run
+    endGadget()
 
-	# Get the path of the example haddock data
-	exPath <- loadExample()
+    # Get the path of the example haddock data
+    exPath <- loadExample()
 
-	# Init the haddock model
-	initGadget(exPath, "refinputfile")
+    # Init the haddock model
+    initGadget(exPath, "refinputfile")
 
-	# Run the hindcast period
-	gadgetFLR <- runUntil(params[["projYear"]] - 1, params)
+    # Run the hindcast period
+    gadgetFLR <- runUntil(params[["projYear"]] - 1, params)
 
-  yrList <- c(params[["projYear"]]:params[["finalYear"]])
+    yrList <- c(params[["projYear"]]:params[["finalYear"]])
 
-	for(year in yrList) {
-		print(year)
+    for(year in yrList) {
+        # Loop through unique stocks
+        for(sp in params$stockList) {
+            # Predict and update recruitment
+            pr <- predict_recruitment(gadgetFLR[[sp]]$stk, model = modelsel)
+            rec <- round(pr$rec/10000)
+            updateRenewal(sp, year, step = 1, area = 1, age = 1,
+                number = rec, mean = 16.41, sdev = 2.25 ,
+                alpha = 8.85e-6, beta = 3.0257)
 
-    # Loop through unique stocks
-    for(sp in params$stockList) {
-      # Predict and update recruitment
-		  pr <- predict_recruitment(gadgetFLR[[sp]]$stk, model = modelsel)
-      rec <- round(pr$rec/10000)
-		  updateRenewal(sp, year, step = 1, area = 1, age = 1,
-            number = rec, mean = 16.41, sdev = 2.25 ,
-		        alpha = 8.85e-6, beta = 3.0257)
+            # Predict TAC and update catch (spreads throughout 4 seasons/steps)
+            tac <- predict_TAC(year, gadgetFLR[[sp]]$stk, gadgetFLR[[sp]]$idx, pr$srmodel)
+            tacPortion <- c(0.232, 0.351, 0.298, 0.119)
+            targetFleet <- params[[sp]][["forecasts"]]
+            updateAmount(targetFleet, year, 1, 1, tacPortion[[1]] * tac)
+            updateAmount(targetFleet, year, 2, 1, tacPortion[[2]] * tac)
+            updateAmount(targetFleet, year, 3, 1, tacPortion[[3]] * tac)
+            updateAmount(targetFleet, year, 4, 1, tacPortion[[4]] * tac)
+        }
 
-      # Predict TAC and update catch (spreads throughout 4 seasons/steps)
-		  tac <- predict_TAC(year, gadgetFLR[[sp]]$stk, gadgetFLR[[sp]]$idx, pr$srmodel)
-      tacPortion <- c(0.232, 0.351, 0.298, 0.119)
-      targetFleet <- params[[sp]][["forecasts"]]
-      updateAmount(targetFleet, year, 1, 1, tacPortion[[1]] * tac)
-      updateAmount(targetFleet, year, 2, 1, tacPortion[[2]] * tac)
-      updateAmount(targetFleet, year, 3, 1, tacPortion[[3]] * tac)
-      updateAmount(targetFleet, year, 4, 1, tacPortion[[4]] * tac)
+        # Forward a year
+        out <- runYear()
+
+        # Loop through unique stocks to update the FLR objects
+        for(sp in params$stockList) {
+        gadgetFLR[[sp]]$stk <- window(gadgetFLR[[sp]]$stk, end = year)
+        gadgetFLR[[sp]]$idx <- window(gadgetFLR[[sp]]$idx, end = year)
+
+        gadgetFLR[[sp]] <- updateFLStock(sp, out, as.character(year),
+            gadgetFLR[[sp]]$stk, gadgetFLR[[sp]]$idx, params)
+        }
     }
-
-    # Forward a year
-    out <- runYear()
-
-    # Loop through unique stocks to update the FLR objects
-    for(sp in params$stockList) {
-      gadgetFLR[[sp]]$stk <- window(gadgetFLR[[sp]]$stk, end = year)
-      gadgetFLR[[sp]]$idx <- window(gadgetFLR[[sp]]$idx, end = year)
-
-      gadgetFLR[[sp]] <- updateFLStock(sp, out, as.character(year),
-          gadgetFLR[[sp]]$stk, gadgetFLR[[sp]]$idx, params)
-    }
-	}
-
-  return(gadgetFLR)
-
+    return(gadgetFLR)
 }
 ```
 
@@ -334,7 +329,7 @@ had.stk <- propagate(had.stk, length(models))
 
 # Store different run results in different FLStock iterations
 for(i in c(1:length(models))) {
-  iter(had.stk, i) <- result[[i]]$had$stk
+    iter(had.stk, i) <- result[[i]]$had$stk
 }
 ```
 
