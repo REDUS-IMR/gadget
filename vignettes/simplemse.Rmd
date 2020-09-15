@@ -1,6 +1,6 @@
 ---
-title: "GadgetR: Quick and Dirty Management Strategy Evaluation (MSE) using
-  Gadget as the Operating Model (OM)"
+title: "GadgetR: (Very) Simple short-cut Management Strategy Evaluation (MSE)
+  using Gadget as the Operating Model (OM)"
 author: "Ibrahim Umar"
 date: "`r Sys.Date()`"
 package: gadgetr
@@ -8,7 +8,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{GadgetR: Quick and Dirty Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)}
+  %\VignetteIndexEntry{GadgetR: (Very) Simple short-cut Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -41,52 +41,83 @@ knitr::knit_hooks$set(output = function(x, options) {
    hook_output(x, options)
 })
 ```
-This guide will demonstrate the gadgetr ability to run and manipulate a gadget
-model simulation so that it would perform as an Operating Model (OM) in a
-Management Strategy Evaluation (MSE) loop.
+This guide will demonstrate how you can use gadgetr to set up and run a simple
+short-cut (no assessment) management strategy evaluation (MSE) using a gadget
+model as an Operating Model (OM).
 
-# Loading the package
+# Installing the package
+
+As for now, the package is yet to find its way into CRAN. However, you can use
+our alternative repo that enables you to use R's ```install.packages()```:
+
+```
+install.packages("gadgetr", repos = "https://redus-imr.github.io/gadget")
+```
+
+Or, you can download and install from the pre-compiled binaries here:
+
+```
+https://github.com/REDUS-IMR/gadget/releases/latest
+```
+
+Or, you might want to compile it from the source available in Github:
+
+```{r eval=FALSE}
+devtools::install_github("REDUS-IMR/gadget", ref="gadgetr")
+```
+
+# The main code
+
+To facilitate parallel runs, the whole MSE codes are encapsulated in a function
+called `runPMSE()`:
+
+```{r, a, eval=FALSE}
+runPMSE <- function(seed = 1234) {
+```
+
+## Loading the package
 
 Load the package as usual using the command below.
 
-```{r setup}
+```{r, b, eval=FALSE}
 library(gadgetr)
 ```
-# Loading the example model
+## Loading the example model
 
-For this guide we will use the included haddock model. This model contains the
-observed stock and fleet data up to year 1999. However, the model end time
-(i.e., `lastyear` parameter) has been set as 2020 to support an exploratory
-forecast run.
+We will use the example haddock model. For this purpose, we use the model
+fitted to the historical period (1978–1999) and project 21-year forecasts
+(2000–2020) by extending the simulation years in the gadget model.This means
+that the model end time parameter (`lastyear`) is set to 2020.
 
-```{r}
-# Get the path of the example haddock data
+```{r, c, eval=FALSE}
+# Get the path of the example haddock model
 exPath <- gadgetr::loadExample()
 print(exPath)
 
-# Init the haddock model
+# Initiate the haddock model
 gadgetr::initGadget(exPath, "refinputfile")
 
-# Print info
+# Print the basic model information
 gadgetr::getEcosystemInfo()
 
 # Init seed
-set.seed(1098765)
+set.seed(seed)
 ```
 
-# Defining helper functions
+## Defining helper functions
 
-For the MSE purpose, we need to define four helper functions, namely a SSB
-calculation function, a recruitment calculation function, a recruitment
-forecast function, and a TAC calculation function.
+For this simple demonstration, we create four helper functions for MSE
+simulations; 1) a function to calculate SSB, 2) a function to extract recruit
+numbers, 3) a function to forecast recruitment, and 4) a function to calculate
+TAC.
 
-## Calculating SSB
+### 1) Calculating SSB
 
 This function calculates the spawning stock biomass (SSB) for a given stock.
-Here we assume that individuals with age more than 3 are mature and only stock
-information in step 4 will be taken into the calculation.
+Here we assume that individuals of 3-year-olds and older are mature and only
+stock information in step 4 will be taken into the calculation.
 
-```{r}
+```{r, d, eval=FALSE}
 # Calculate SSB
 calcSSB <- function(stk) {
     # Get SSB
@@ -96,14 +127,15 @@ calcSSB <- function(stk) {
 }
 ```
 
-## Calculating recruitment
+### 2) Calculating recruitment
 
-A simple function for calculating the "real" recruitment values for a given
-stock in a year. Only age 1 individuals are used in the calculation
-and as stock information (numbers and weights) were collected after each step
-is run, we use only the values from step 2.
+A simple function for calculating the "real" recruitment values (no observation
+error) for a given stock in a year. Only 1-year-olds are used in the
+calculation. Because stock information (numbers and weights) is collected after
+each quarter (`step`) in simulations, we use the recruitment values from
+quarter 2.
 
-```{r}
+```{r, e, eval=FALSE}
 # Calculate Recruitment
 calcRecruitment <- function(stk) {
     # Get Recruitment (based on fbar and only from the last step)
@@ -111,41 +143,49 @@ calcRecruitment <- function(stk) {
     return(sum(subs[, "number"]))
 }
 ```
-## Forecasting a recruitment
+### 3) Forecasting a recruitment
 
-This function use a bit of "magic" to forcasting the stok recruitment value.
+This function uses the constant recruitment model fit to forecast recruitment.
 
-```{r}
-# Supposed the haddock recruitment forecast for a given year is a matter of
-# picking a random number...
-fcRecruitment <- function() {
-    return(sample(1:25, 1) * 1000)
+```{r, f, eval=FALSE}
+# In this example, we assume that the haddock recruitment for a given year is
+# equal to the historical geometric mean recruitment
+fcRecruitment <- function(rec) {
+    rec <- unlist(rec)
+    return(exp(mean(log(rec))))
 }
 ```
 
-## Calculating TAC
+### 4) Calculating TAC
 
-A simple function for calculating the next year's total allowable catch (TAC)
-given a stock's SSB value for a particular year.
+We use a simple function to project the next year’s total allowable catch
+(TAC), assuming that target exploitation rate is 40% of stock biomass in a
+given year.
 
-```{r}
-# ... and calculating TAC is a matter of taking 35% of the stock's last year
-# SSB value
-calcTAC <- function(ssb) {
-    return(.4 * ssb)
+```{r, g, eval=FALSE}
+# and calculating TAC is a matter of taking 40% of the stock's last year
+# stock biomass value with added noise
+calcTAC <- function(stk) {
+    # Get TSB
+    subs <- stk[stk[, "step"] == 4, ]
+    tsb <- sum(subs[, "number"] * subs[, "meanWeights"])
+    # Calculate error
+    err <- rnorm(1, 0, tsb * .25)
+    # Calculate TAC
+    tac <- .4 * (tsb + err)
+    return(tac)
 }
 ```
 
-# Running the hindcast simulation
+## Running the hindcast simulation
 
-The haddock example model hindcast period spans from year 1978 until 1999.
-Therefore, as a first step, we need to run gadget until the end of year 1999.
+The haddock model’s hindcast period spans from 1978 to 1999. As the first step,
+we run gadget until 1999.
 
-```{r}
+```{r, h, eval=FALSE}
 # Placeholders for values
 stats <- list()
 ssb <- list()
-fcrec <- list()
 rec <- list()
 
 # Loop for the hindcast period
@@ -156,28 +196,28 @@ while ( status[["time"]]["currentYear"] < forecastYear ) {
   curYr <- as.character(status[["time"]]["currentYear"])
   stats[[curYr]] <- gadgetr::runYear()
   ssb[[curYr]] <- calcSSB(stats[[curYr]]$stock$had$stk)
+  rec[[curYr]] <- calcRecruitment(stats[[curYr]]$stock$had$stk)
   # Get the latest runtime information
   status <- gadgetr::getEcosystemInfo()
 }
 ```
 
-# Running the forecast simulation
+## Running the forecast simulation
 
-Now, we run the simulation from year 2000 until 2020. In addition to looping
-through the years, we also performing these additional steps at the beginning
-of the year (i.e., before step 1):
+Now, we run the simulation from year 2000 to 2020. In looping through the
+years, we also perform the following steps at the beginning of the year
+(i.e., before quarter (`step`) 1):
 
-1. Defining the Haddock recruitment value by calling the `fcRecruitment()`
-function.
-2. Applying the obtained recruitment value into gadget simulation using
-`gadgetr::updateRenewal()` function, targeting the "had" stock.
-3. Calculating last year's SSB value in the beginning of the year using
-`calcSSB()` function.
-4. Calculating TAC value for the year using `calcTAC()` function.
-5. Applying the calculated TAC value back into gadget simulation using
-`gadgetr::updateAmount()` function, targeting the "future" fleet.
+1. Project recruitment by calling `fcRecruitment()`.
+2. Apply the projected recruitment to the simulation using
+`gadgetr::updateRenewal()` on the _had_ stock.
+3. Calculate the last year’s SSB at the beginning of the year using
+`calcSSB()`.
+4. Calculate TAC for the year using `calcTAC()`.
+5. Apply the calculated TAC to the _future_ total fleet in the gadget
+simulation using `gadgetr::updateAmount()`.
 
-```{r output.lines=25}
+```{r, i, eval=FALSE}
 # MSE loop
 while ( status[["time"]]["finished"] != 1 ) {
   # Time calculation
@@ -185,25 +225,26 @@ while ( status[["time"]]["finished"] != 1 ) {
   lastYr <- curYr - 1
   
   # Calculate Recruitment for this year
-  recNumber <- fcRecruitment()
-  fcrec[[as.character(curYr)]] <- recNumber
+  recNumber <- fcRecruitment(rec)
+  rec[[as.character(curYr)]] <- recNumber
   print(paste("Recruitment in", curYr, "is", recNumber))
 
   # Apply recruitment number for this year haddock stock
   # note that this is similar to the format found in "had.rec" file
   updateRenewal("had", curYr, step = 1, area = 1, age = 1,
-      number = recNumber, mean = 16.41, sdev = 2.25 , alpha = 8.85e-6,
+      number = (recNumber/10000), mean = 16.41, sdev = 2.25 , alpha = 8.85e-6,
       beta = 3.0257)
 
   # Calculate last year SSB
-  ssb[[as.character(lastYr)]] <- 
-      calcSSB(stats[[as.character(lastYr)]]$stock$had$stk)
+  stk0 <- stats[[as.character(lastYr)]]$stock$had$stk
+  ssb[[as.character(lastYr)]] <- calcSSB(stk0)
 
   # Calculate TAC for this year
-  tac <- calcTAC(ssb[[as.character(lastYr)]])
+  tac <- calcTAC(stk0)
   print(paste("TAC in", curYr, "is", tac))
 
-  # Apply TAC to fleet data (spread out between 4 steps in a year)
+  # Apply TAC to fleet data (spread out over 4 quarter/step in a year)
+  # in percentage (i.e., sum(tacPortion) == 1)
   tacPortion <- c(0.232, 0.351, 0.298, 0.119)
   targetFleet <- "future"
   updateAmount(targetFleet, curYr, 1, 1, tacPortion[[1]] * tac)
@@ -219,46 +260,126 @@ while ( status[["time"]]["finished"] != 1 ) {
 }
 ```
 
-# Summarizing recruitment and catch values
+## Summarizing stock status and catch
 
-After the loop finishes, we might want to summarize several important metric
-values over the years.
+After the loop finishes, we summarize the main performance metrics.
 
-```{r}
-# Calculate real recruitment
-rec <- lapply(stats, function(x) calcRecruitment(x$stock$had$stk))
-
-# Calculate real catch (future fleet)
-catch <- lapply(stats, function(x) 
-    sum(x$fleet$future$catch$had[, "biomassConsumed"]))
-
+```{r, j, eval=FALSE}
+print(rec)
+# Calculate real catch (all fleets)
+catch <- lapply(stats, function(x) {
+    sum(x$fleet$future$catch$had[, "biomassConsumed"], na.rm = TRUE) +
+    sum(x$fleet$comm$catch$had[, "biomassConsumed"], na.rm = TRUE) +
+    sum(x$fleet$survey$catch$had[, "biomassConsumed"], na.rm = TRUE)
+  })
 ```
 
-# Plotting the results
-
-And plot it:
-
-```{r plot, fig.height=5, fig.width=7, fig.fullwidth=TRUE, fig.cap = "Haddock simulation numbers"}
-# Plot the world
-maxy <- max(c(unlist(ssb), unlist(rec)))
-cl <- rainbow(3)
-plot(0, 0, xlim = c(1978, 2020), ylim = c(0, maxy), type = "n", xlab = "Year",
-    ylab = "", main = "Haddock gadget model")
-lines(names(ssb), ssb, col = cl[1], type = "l")
-lines(names(rec), rec, col = cl[2], type = "l")
-lines(names(catch), catch, col = cl[3], type = "l")
-abline(v = 2000, col="darkorange", lwd=3, lty=2)
-legend(1980, maxy, legend=c("SSB (had)", "Recruitment (had)", 
-    "Catch (future fleet)"), col=cl, lty=1, cex=1, bg='lightblue1')
-```
-
-# Ending gadget
+## Ending gadget
 
 After each simulation, it is necessary to properly terminate an active
 gadget simulation run.
 
-```{r}
+```{r, k, eval=FALSE}
 endGadget()
 ```
+
+## Ending runPMSE
+
+```{r, l, eval=FALSE}
+    return(list(ssb, rec, catch))
+}
+```
+
+This is the end of the `runPMSE()` and we return the recruitment, SSB and 
+catch metrics.
+
+# Do a single run
+
+Now let's try to do a single run and plot the output. But first let's make a
+plot generator function.
+
+```{r}
+plotIt <- function(x) {
+    singlePlot <- function(cat, name, title) {
+        # Collect metrics
+        z <- do.call(cbind, lapply(x, function(y) unlist(y[[cat]])))
+        tab <- as.data.frame(z)
+        tab$year <- as.numeric(rownames(tab))
+        tab <- reshape(tab, varying=list(1:(ncol(tab)-1)), direction="long", v.names = name)
+        fig <- ggplot(tab, aes_string("year", name)) +
+                    stat_summary(geom = "line", fun = mean) +
+                    stat_summary(geom = "ribbon", fun.data = mean_sdl, fun.args = list(mult = 1), fill = "red", alpha = 0.2) +
+                    stat_summary(geom = "ribbon", fun.data = mean_cl_normal, fill = "red", alpha = 0.3) + 
+                    labs(title=paste("Haddock", title), y="")
+        return(fig)
+    }
+
+  ssbplot <- singlePlot(1, "ssb", "SSB")
+  recplot <- singlePlot(2, "rec", "Recruitment")
+  catchplot <- singlePlot(3, "catch", "Catch")
+
+  return(list(ssbplot, recplot, catchplot))
+}
+```
+
+```{r ref.label=c('a','b','c','d','e','f','g','h','i','j','k','l'), echo=FALSE}
+```
+```{r output.lines=25}
+library(ggplot2)
+result <- runPMSE()
+```
+
+## Plotting the result
+
+Generate the performance metric plots.
+
+```{r plot1, fig.height=5, fig.width=7, fig.fullwidth=TRUE, fig.cap="Haddock model (single-run) performance metrics"}
+plots <- plotIt(list(result))
+print(plots[[1]])
+print(plots[[2]])
+print(plots[[3]])
+```
+
+# Do multiple runs in parallel
+
+Here is an example of doing a multiple iteration runs utilizing the R parallel
+execution capability.
+
+```{r}
+library(parallel)
+
+chk <- Sys.getenv("_R_CHECK_LIMIT_CORES_", "")
+
+if (nzchar(chk) && chk == "TRUE") {
+    # use 2 cores in CRAN/actions
+    num_workers <- 2L
+} else {
+    # use all cores in devtools::test()
+    num_workers <- detectCores()
+}
+
+cl <- makeCluster(num_workers, type = "PSOCK")
+
+# Run
+seeds <- round(runif(100, 1, 10000))
+result <- parLapply(cl, seeds, runPMSE)
+
+stopCluster(cl)
+
+plots <- plotIt(result)
+
+```
+
+## Plotting the result
+
+Plot the performance metrics from the runs.
+
+```{r plot2, fig.height=5, fig.width=7, fig.fullwidth=TRUE, fig.cap="Haddock model (parallel-runs) performance metrics"}
+print(plots[[1]])
+print(plots[[2]])
+print(plots[[3]])
+```
+
+
 
 

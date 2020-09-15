@@ -39,10 +39,15 @@ Or, you might want to compile it from the source available in Github:
 devtools::install_github("REDUS-IMR/gadget", ref="gadgetr")
 ```
 
-# Running the sample Haddock model
+# Running the example Haddock model
 
-This guide demonstrates the gadgetr library ability of controlling a gadget
-model run and extracting the relevant information from the run. 
+This guide demonstrates gadgetr’s capability of controlling a gadget model run
+and extracting relevant information during the run. To run simulations,
+GadgetR requires a gadget model as ‘input’ (normally a set of text files). In
+this tutorial, we demonstrate how you set up and run GadgetR simulations using
+a simple haddock
+[model](https://github.com/Hafro/gadget2/blob/master/examples/haddock.md)
+by James Begley.
 
 ## Loading the package
 
@@ -63,12 +68,12 @@ exPath <- gadgetr::loadExample()
 print(exPath)
 ```
 
-To initialize a gadget run, we have to specify the full path of the model
-and also the input file. In the example model, the input file is the file
-named `refinputfile`.
+To initialize a gadgetR run, we have to specify the full path of the model
+folder and input (parameter) file. In the example model, the input file is
+the file named  `refinputfile`.
 
 ```{r}
-# Init the haddock model
+# Initiate the haddock model
 gadgetr::initGadget(exPath, "refinputfile")
 ```
 
@@ -78,9 +83,9 @@ to be run.
 
 ## Printing the model ecosystem information
 
-Now that the model is loaded, we might want to inspect some of the important
-objects in the simulation. The ```getEcosystemInfo()``` is a useful function
-that provides this type of information.
+Now that the model is loaded, we can inspect some of the important objects in
+the simulation. The ```getEcosystemInfo()``` is a useful function that provides
+this type of information.
 
 ```{r}
 # Get the initial information
@@ -97,15 +102,14 @@ print(initial$time["totalSteps"])
 
 ## Moving the simulation forward
 
-As we can see in the previous section, the sample haddock model has a certain 
+As we can see in the previous section, the example haddock model has a certain 
 number of simulation steps. Now let's loop through the time steps while
 collecting the important metrics from the fleets and the stocks.
 
 The package provides two alternative functions to forward the simulation
 time. These functions are ```runStep()``` and ```runYear()```, which forward
-the simulation by a step and a year, respectively. Both functions returns
-the metrics from both stocks and fleets objects at that particular step or
-year.
+the simulation by step and year, respectively. Both functions return
+the metrics from both stocks and fleets objects at a particular step or year.
 
 ```{r}
 # Variable for counting step
@@ -138,7 +142,7 @@ print(lengthStep)
 
 In the above code, a condition ```status[["time"]]["finished"] == 1```
 terminates the loop. The ```getEcosystemInfo()``` gives an updated status of
-the model run whenever it called. It also gives an information whether the
+the model run whenever it is called. It also gives information whether the
 simulation has reached to an end.
 
 You may also safely replace the ```runStep()``` with ```runYear()``` in the
@@ -151,12 +155,12 @@ from the model's objects.
 
 The greatest advantage of this package is its ability to extract and modify
 information directly from/to the gadget's internal runtime objects in memory.
-This will save user from tinkering with the gadget model configuration files 
+This will save users from tinkering with the gadget model configuration files 
 and also it output printing files.
 
 This guide won't cover the on-the-fly modification of a gagdet internal
-objects. However, the code below should demonstrates the package ability on
-gadget information extraction. 
+objects. However, the code below should demonstrates the package's capability
+to extract gadget information. 
 
 ```{r}
 # Print out all status
@@ -181,8 +185,8 @@ print(tail(stats[[1]]$fleet$comm$catch$had))
 
 ## Terminating the model run
 
-After each simulation, it is necessary for user to properly terminate an active
-gadget simulation run. Use the code below after you finished with a simulation
+After each simulation, it is necessary for users to properly terminate an active
+gadget simulation run. Use the code below when you finish with a simulation
 run or if you want to restart the current model or loading a new model.
 
 ```{r}

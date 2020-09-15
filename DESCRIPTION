@@ -1,8 +1,8 @@
 Package: gadgetr
 Type: Package
 Title: GadgetR: Interactive and Exploratory Gadget Model Simulation in R
-Version: 0.9.2
-Date: 2020-08-04
+Version: 0.9.3
+Date: 2020-09-14
 Authors@R: c(person("Bjarki Thor", "Elvarsson", email="bjarki.elvarsson@hafogvatn.is",role = c("aut", "cre")),
             person("James","Begley", email="james@hafro.is",role=c("aut")),
             person("Hoskuldur","Bjornsson", email="hoski@hafro.is",role=c("aut")),
@@ -38,7 +38,7 @@ Imports:
     FLCore,
     methods
 LinkingTo: Rcpp
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Encoding: UTF-8
 Suggests: 
     testthat,
@@ -48,7 +48,9 @@ Suggests:
     FLBRP,
     FLash,
     ggplotFL,
-    parallel
+    parallel,
+    ggplot2,
+    Hmisc
 Additional_repositories: https://flr-project.org/R/
 VignetteBuilder: knitr
 Biarch: true

@@ -12,7 +12,7 @@
 #' @importFrom FLCore window catch.n<- stock.n<- index<- catch<- catch.wt<- 
 #' discards discards<- discards.n discards.n<- discards.wt discards.wt<-
 #' landings landings<- landings.n landings.n<- landings.wt landings.wt<-
-#' stock<- stock.wt<- m m<- harvest harvest<- range<- 
+#' stock<- stock.wt<- m m<- harvest harvest<- mat mat<- range<-
 #' @importFrom stats aggregate
 #' @export
 updateFLStock <- function(stockTitle, out, gadgetYear, fl_stock, fl_index, globalparams) {
@@ -271,16 +271,16 @@ updateFLStock <- function(stockTitle, out, gadgetYear, fl_stock, fl_index, globa
 	catch.n(fl_index)[catch.n(fl_index)==0] <- 1
 	index(fl_index)[index(fl_index)==0] <- 1
 
-	## TODO: Filling mean weights
+	## Replace NAs with 3-years average value
 	### Catch
-	#catch.wt(fl_stock) <- fillWeights(catch.wt(fl_stock))
-	#discards.wt(fl_stock) <- fillWeights(discards.wt(fl_stock))
-	#landings.wt(fl_stock) <- fillWeights(landings.wt(fl_stock))
-	#stock.wt(fl_stock) <- fillWeights(stock.wt(fl_stock))
-	#mat(fl_stock) <- fillWeights(mat(fl_stock))
-	#harvest(fl_stock) <- fillWeights(harvest(fl_stock))	
+	catch.wt(fl_stock) <- na.Ave(catch.wt(fl_stock), gadgetYear)
+	discards.wt(fl_stock) <- na.Ave(discards.wt(fl_stock), gadgetYear)
+	landings.wt(fl_stock) <- na.Ave(landings.wt(fl_stock), gadgetYear)
+	stock.wt(fl_stock) <- na.Ave(stock.wt(fl_stock), gadgetYear)
+	mat(fl_stock) <- na.Ave(mat(fl_stock), gadgetYear)
+	harvest(fl_stock) <- na.Ave(harvest(fl_stock), gadgetYear)
 	### Survey
-	#catch.wt(fl_index) <- fillWeights(catch.wt(fl_index))
+	catch.wt(fl_index) <- na.Ave(catch.wt(fl_index), gadgetYear)
 
 	return(list(stk=fl_stock, idx=fl_index))
 }
@@ -384,5 +384,22 @@ runUntil <- function(until, globalparams) {
 			break
 	}
 	return(combinedOut)
+}
+
+# Function to fill NA values in an FLR objects with average last three years
+na.Ave <- function(inp, yr, yr.ave = 3) {
+  ages <- dimnames(inp)$age
+  years <- dimnames(inp)$year
+  na.yrs <- years[colSums(is.na(inp)) > 0]
+  na.yr <- intersect(as.character(yr), na.yrs)
+
+  if( length(na.yr) > 0 ) {
+    yr.ave.range <- as.character((as.numeric(na.yr)-yr.ave):(as.numeric(na.yr) - 1))
+    na.target <- is.na(inp[, na.yr])
+    tmp <- inp[, na.yr]
+    tmp[na.target, na.yr] <- rowSums(inp[na.target, (yr.ave.range)])/yr.ave
+    inp[, na.yr] <-  tmp
+  }
+  return(inp)
 }
 

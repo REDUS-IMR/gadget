@@ -39,4 +39,4 @@ acomm    -10.342371   -100    -1     1 ; alpha in fleet suitability
 bcomm    0.21405130   0.1     10     1 ; beta in fleet suitability
 asur     -4.3391371   -100    -1     1 ; alpha in survey suitability
 bsur     0.22464659   0.1     10     1 ; beta in survey suitability
-mult     0.5          0.1     1      1 ; multiplier for future fleet
+;mult     0.5          0.1     1      1 ; multiplier for future fleet
