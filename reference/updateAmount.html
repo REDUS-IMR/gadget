@@ -72,7 +72,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gadgetr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.3</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@
       <a href="../articles/quickstart.html">GadgetR: Quick Start Guide</a>
     </li>
     <li>
-      <a href="../articles/simplemse.html">GadgetR: Quick and Dirty Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
+      <a href="../articles/simplemse.html">GadgetR: (Very) Simple short-cut Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
     </li>
   </ul>
 </li>
@@ -130,7 +130,7 @@
     <p>This function updates the catch amount of a totalfleet object.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>updateAmount</span>(<span class='no'>fleetName</span>, <span class='no'>year</span>, <span class='no'>step</span>, <span class='no'>area</span>, <span class='no'>value</span>)</pre>
+    <pre class="usage"><span class='fu'>updateAmount</span>(<span class='kw'>fleetName</span>, <span class='kw'>year</span>, <span class='kw'>step</span>, <span class='kw'>area</span>, <span class='kw'>value</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -162,18 +162,19 @@
     <p>a vector of numeric error codes (0 is success, otherwise is error)</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
-<span class='kw'>if</span>(<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()){
- <span class='no'>exPath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loadExample.html'>loadExample</a></span>()
- <span class='fu'><a href='initGadget.html'>initGadget</a></span>(<span class='no'>exPath</span>, <span class='st'>"refinputfile"</span>)
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='co'>if</span>(<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()){
+ <span class='kw'>exPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loadExample.html'>loadExample</a></span>()
+ <span class='fu'><a href='initGadget.html'>initGadget</a></span>(<span class='kw'>exPath</span>, <span class='st'>"refinputfile"</span>)
  <span class='fu'>updateAmount</span>(<span class='st'>"future"</span>, <span class='fl'>1978</span>, <span class='fl'>1</span>, <span class='fl'>1</span>, <span class='fl'>123456</span>)
  <span class='fu'>updateAmount</span>(<span class='st'>"future"</span>, <span class='fl'>1978</span>, <span class='fl'>3</span>, <span class='fl'>1</span>, <span class='fl'>567890</span>)
- <span class='no'>stat</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='runStep.html'>runStep</a></span>()
- <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='no'>stat</span>$<span class='no'>fleets</span>$<span class='no'>future</span>$<span class='no'>catch</span>$<span class='no'>had</span>[, <span class='st'>"biomassConsumed"</span>]))
- <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/aggregate.html'>aggregate</a></span>(<span class='no'>biomassConsumed</span> ~ <span class='no'>year</span> + <span class='no'>step</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>stat</span>$<span class='no'>fleets</span>$<span class='no'>future</span>$<span class='no'>catch</span>$<span class='no'>had</span>, <span class='kw'>FUN</span><span class='kw'>=</span><span class='no'>sum</span>))
+ <span class='kw'>stat</span> <span class='op'>&lt;-</span> <span class='fu'><a href='runStep.html'>runStep</a></span>()
+ <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span>(<span class='kw'>stat</span><span class='op'>$</span><span class='kw'>fleets</span><span class='op'>$</span><span class='kw'>future</span><span class='op'>$</span><span class='kw'>catch</span><span class='op'>$</span><span class='kw'>had</span>[, <span class='st'>"biomassConsumed"</span>]))
+ <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span>(<span class='fu'><a href='https://rdrr.io/r/stats/aggregate.html'>aggregate</a></span>(<span class='kw'>biomassConsumed</span> <span class='op'>~</span> <span class='kw'>year</span> <span class='op'>+</span> <span class='kw'>step</span>, data = <span class='kw'>stat</span><span class='op'>$</span><span class='kw'>fleets</span><span class='op'>$</span><span class='kw'>future</span><span class='op'>$</span><span class='kw'>catch</span><span class='op'>$</span><span class='kw'>had</span>, FUN=<span class='kw'>sum</span>))
  <span class='fu'><a href='endGadget.html'>endGadget</a></span>()
  }
-}</div></pre>
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -189,7 +190,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

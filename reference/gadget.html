@@ -75,7 +75,7 @@ before calling this function. Must be followed by initSim" />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gadgetr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.3</span>
       </span>
     </div>
 
@@ -104,7 +104,7 @@ before calling this function. Must be followed by initSim" />
       <a href="../articles/quickstart.html">GadgetR: Quick Start Guide</a>
     </li>
     <li>
-      <a href="../articles/simplemse.html">GadgetR: Quick and Dirty Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
+      <a href="../articles/simplemse.html">GadgetR: (Very) Simple short-cut Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
     </li>
   </ul>
 </li>
@@ -136,7 +136,7 @@ the working directory (e.g., by <code><a href='https://rdrr.io/r/base/getwd.html
 before calling this function. Must be followed by <code><a href='initSim.html'>initSim</a></code></p>
     </div>
 
-    <pre class="usage"><span class='fu'>gadget</span>(<span class='no'>args</span>)</pre>
+    <pre class="usage"><span class='fu'>gadget</span>(<span class='kw'>args</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,14 +153,16 @@ before calling this function. Must be followed by <code><a href='initSim.html'>i
 gadget.</p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
- <span class='kw'>if</span>(<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()){
-  <span class='no'>exPath</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='loadExample.html'>loadExample</a></span>()
-  <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>setwd</a></span>(<span class='no'>exPath</span>)
+    <pre class="examples"><div class='input'><span class='co'>if</span> (<span class='fl'>FALSE</span>) {
+ <span class='co'>if</span>(<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()){
+  <span class='kw'>exPath</span> <span class='op'>&lt;-</span> <span class='fu'><a href='loadExample.html'>loadExample</a></span>()
+  <span class='fu'><a href='https://rdrr.io/r/base/getwd.html'>setwd</a></span>(<span class='kw'>exPath</span>)
   <span class='fu'>gadget</span>(<span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"-s"</span>, <span class='st'>"-main"</span>, <span class='st'>"main"</span>, <span class='st'>"-i"</span>, <span class='st'>"refinputfile"</span>))
   <span class='fu'><a href='initSim.html'>initSim</a></span>()
  }
-}</div></pre>
+}
+
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -176,7 +178,7 @@ gadget.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

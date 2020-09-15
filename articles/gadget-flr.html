@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gadgetr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.3</span>
       </span>
     </div>
 
@@ -60,7 +60,7 @@
       <a href="../articles/quickstart.html">GadgetR: Quick Start Guide</a>
     </li>
     <li>
-      <a href="../articles/simplemse.html">GadgetR: Quick and Dirty Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
+      <a href="../articles/simplemse.html">GadgetR: (Very) Simple short-cut Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
     </li>
   </ul>
 </li>
@@ -81,7 +81,7 @@
       <h1 data-toc-skip>GadgetR: Gadget and FLR Example</h1>
                         <h4 class="author">Ibrahim Umar</h4>
             
-            <h4 class="date">2020-08-18</h4>
+            <h4 class="date">2020-09-15</h4>
       
       
       <div class="hidden name"><code>gadget-flr.Rmd</code></div>
@@ -90,37 +90,65 @@
 
     
     
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="co"># Set simulation time parameters</span>
-<span class="no">firstYear</span> <span class="kw">&lt;-</span> <span class="fl">1978</span>
-<span class="no">projYear</span> <span class="kw">&lt;-</span> <span class="fl">2000</span>
-<span class="no">finalYear</span> <span class="kw">&lt;-</span> <span class="fl">2020</span>
+<div id="about-flr-capability-of-gadgetr" class="section level1">
+<h1 class="hasAnchor">
+<a href="#about-flr-capability-of-gadgetr" class="anchor"></a>About FLR capability of GadgetR</h1>
+<p>The FLR project ([<a href="https://flr-project.org" class="uri">https://flr-project.org</a>]) is a collection of fisheries library in R that provide a set of tools for quantitative fisheries science.</p>
+<p>GadgetR has a built-in automatic FLR objects generator feature when running a model simulation. This interoperability enables users to utilize the wealth of useful tools that the FLR suite offers when running a Gadget model simulation.</p>
+<p>This guide will demonstrate a simple scenario of how to run a simple short-cut (no assessment) management strategy evaluation (MSE) using a gadget model as an Operating Model (OM). The management loop, especially the recruitment forecast and total allowable catch determination are calculated using several tools that FLR provides (e.g., (FLSR)[<a href="https://flr-project.org/doc/Modelling_stock_recruitment_with_FLSR.html" class="uri">https://flr-project.org/doc/Modelling_stock_recruitment_with_FLSR.html</a>] for the modelling of stock-recruitment). This MSE code also utilizes several different stock-recruitment models running in parallel to investigate the possible uncertainty sources during the simulated management process.</p>
+<div id="installing-the-package" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installing-the-package" class="anchor"></a>Installing the package</h2>
+<p>As for now, the package is yet to find its way into CRAN. However, you can use our alternative repo that enables you to use R’s <code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages()</a></code>:</p>
+<pre><code><a href="https://rdrr.io/r/utils/install.packages.html">install.packages("gadgetr", repos = "https://redus-imr.github.io/gadget")</a></code></pre>
+<p>Or, you can download and install from the pre-compiled binaries here:</p>
+<pre><code>https://github.com/REDUS-IMR/gadget/releases/latest</code></pre>
+<p>Or, you might want to compile it from the source available in Github:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="kw">devtools</span>::<span class="fu">install_github</span>(<span class="st">"REDUS-IMR/gadget"</span>, ref=<span class="st">"gadgetr"</span>)
+</pre></div>
+</div>
+</div>
+<div id="very-simple-mse-with-gadgetr-and-flr" class="section level1">
+<h1 class="hasAnchor">
+<a href="#very-simple-mse-with-gadgetr-and-flr" class="anchor"></a>(Very) simple MSE with GadgetR and FLR</h1>
+<div id="setting-up-the-parameters" class="section level2">
+<h2 class="hasAnchor">
+<a href="#setting-up-the-parameters" class="anchor"></a>Setting up the parameters</h2>
+<p>First we need to define several parameters that will aid the conversion from gadget output into the FLR objects. This parameters need to be carefully tuned and reflects the actual gagdet model parametes.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="co"># Set simulation time parameters</span>
+<span class="kw">firstYear</span> <span class="op">&lt;-</span> <span class="fl">1978</span>
+<span class="kw">projYear</span> <span class="op">&lt;-</span> <span class="fl">2000</span>
+<span class="kw">finalYear</span> <span class="op">&lt;-</span> <span class="fl">2020</span>
 
 <span class="co"># Set up a stock (or stocks) for Gadget</span>
 <span class="co">## List all the unique species</span>
 <span class="co">#stockList &lt;- c("had", "cod")</span>
-<span class="no">stockList</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"had"</span>)
+<span class="kw">stockList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"had"</span>)
 
 <span class="co"># HAD</span>
 <span class="co">## List all the fleets for all the species</span>
-<span class="no">had.fleets</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"comm"</span>, <span class="st">"survey"</span>, <span class="st">"future"</span>)
+<span class="kw">had.fleets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"comm"</span>, <span class="st">"survey"</span>, <span class="st">"future"</span>)
 
 <span class="co">## List all the different stock category for had</span>
-<span class="no">had.stocks</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"had"</span>)
+<span class="kw">had.stocks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"had"</span>)
 
 <span class="co">## List all the mature stock category for had</span>
-<span class="no">had.stocks.mature</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"had"</span>)
+<span class="kw">had.stocks.mature</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"had"</span>)
 
 <span class="co">## List the survey fleets for had</span>
-<span class="no">had.surveys</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"survey"</span>)
+<span class="kw">had.surveys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"survey"</span>)
 
 <span class="co">## List the forecast fleets for had </span>
-<span class="no">had.forecasts</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"future"</span>)
+<span class="kw">had.forecasts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"future"</span>)
 
 <span class="co">## Set stock parameters for the OM</span>
-<span class="co"># m2 = NULL means we calculate m2 from gadget result, m2 = 0 means we use only residual mortality (m1)</span>
+<span class="co"># m2 = NULL means we calculate m2 from gadget result, m2 = 0 means we use only</span>
+<span class="co">#      residual mortality (m1)</span>
 <span class="co"># StockStep: in which step we should observe the stock number</span>
-<span class="no">had.params</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">stockStep</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">minage</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">maxage</span> <span class="kw">=</span> <span class="fl">10</span>, <span class="kw">minfbar</span> <span class="kw">=</span> <span class="fl">2</span>, <span class="kw">maxfbar</span> <span class="kw">=</span> <span class="fl">8</span>,
-                   <span class="kw">startf</span> <span class="kw">=</span> <span class="fl">0.56</span>, <span class="kw">endf</span> <span class="kw">=</span> <span class="fl">0.65</span>, <span class="kw">areas</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>), <span class="kw">m1</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>), <span class="kw">m2</span> <span class="kw">=</span> <span class="kw">NULL</span>)
+<span class="kw">had.params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(stockStep = <span class="fl">2</span>, minage = <span class="fl">1</span>, maxage = <span class="fl">10</span>, minfbar = <span class="fl">2</span>, maxfbar = <span class="fl">8</span>,
+                   startf = <span class="fl">0.56</span>, endf = <span class="fl">0.65</span>, areas = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>), m1 = <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.2</span>), m2 = <span class="kw">NULL</span>)
 
 <span class="co"># COD (if applicable)</span>
 <span class="co">#cod.fleets &lt;- c("cod.comm", "cod.survey")</span>
@@ -128,163 +156,180 @@
 <span class="co">#had.params &lt;- list(stockStep = 2, minage = 1, maxage = 8, minfbar = 4, maxfbar = 8,</span>
 <span class="co">#                   startf = 0.56, endf = 0.65, areas = c(1), m1 = c(0.2), m2 = NULL)</span>
 <span class="co">#...</span>
-
-
+</pre></div>
+<p>After writing the above (exhaustive) parameters, we need a helper function that can convert the parameters into a list object that gagdetr libarary can use for the FLR objects conversion.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit">
 <span class="co"># Helpers for transforming the above into the new parameter format</span>
-<span class="no">parameterize</span> <span class="kw">&lt;-</span> <span class="kw">function</span>() {
+<span class="kw">parameterize</span> <span class="op">&lt;-</span> <span class="fu">function</span>() {
   <span class="co"># Make the global structure</span>
-  <span class="no">prm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">firstYear</span> <span class="kw">=</span> <span class="no">firstYear</span>,
-          <span class="kw">projYear</span> <span class="kw">=</span> <span class="no">projYear</span>,
-          <span class="kw">finalYear</span> <span class="kw">=</span> <span class="no">finalYear</span>,
-          <span class="kw">stockList</span> <span class="kw">=</span> <span class="no">stockList</span>)
+  <span class="kw">prm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(firstYear = <span class="kw">firstYear</span>,
+          projYear = <span class="kw">projYear</span>,
+          finalYear = <span class="kw">finalYear</span>,
+          stockList = <span class="kw">stockList</span>)
 
   <span class="co"># Process each stock</span>
-  <span class="kw">for</span>(<span class="no">stock</span> <span class="kw">in</span> <span class="no">prm</span>$<span class="no">stockList</span>){
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]]<span class="kw">[[</span><span class="st">"params"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">stock</span>, <span class="st">".params"</span>)))
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]]<span class="kw">[[</span><span class="st">"fleets"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">stock</span>, <span class="st">".fleets"</span>)))
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]]<span class="kw">[[</span><span class="st">"stocks"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">stock</span>, <span class="st">".stocks"</span>)))
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]]<span class="kw">[[</span><span class="st">"stocks.mature"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">stock</span>, <span class="st">".stocks.mature"</span>)))
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]]<span class="kw">[[</span><span class="st">"surveys"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">stock</span>, <span class="st">".surveys"</span>)))
-      <span class="no">prm</span><span class="kw">[[</span><span class="no">stock</span>]]<span class="kw">[[</span><span class="st">"forecasts"</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">stock</span>, <span class="st">".forecasts"</span>)))
+  <span class="co">for</span>(<span class="kw">stock</span> <span class="co">in</span> <span class="kw">prm</span><span class="op">$</span><span class="kw">stockList</span>){
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]][[<span class="st">"params"</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text=<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">stock</span>, <span class="st">".params"</span>)))
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]][[<span class="st">"fleets"</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text=<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">stock</span>, <span class="st">".fleets"</span>)))
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]][[<span class="st">"stocks"</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text=<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">stock</span>, <span class="st">".stocks"</span>)))
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]][[<span class="st">"stocks.mature"</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text=<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">stock</span>, <span class="st">".stocks.mature"</span>)))
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]][[<span class="st">"surveys"</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text=<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">stock</span>, <span class="st">".surveys"</span>)))
+      <span class="kw">prm</span>[[<span class="kw">stock</span>]][[<span class="st">"forecasts"</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text=<span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="kw">stock</span>, <span class="st">".forecasts"</span>)))
   }
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">prm</span>)
+  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw">prm</span>)
 }
-
-
+</pre></div>
+</div>
+<div id="recruitment-prediction-function" class="section level2">
+<h2 class="hasAnchor">
+<a href="#recruitment-prediction-function" class="anchor"></a>Recruitment prediction function</h2>
+<p>The following function predicts the next year recruitment given a recruitment model of choice (e.g., Ricker, Beverton-Holt, etc.) and an FLStock object. This function utilizes FLR’s FLSR tool.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit">
 <span class="co"># Predict recruitment</span>
-<span class="no">predict_recruitment</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">stk</span>, <span class="no">model</span>) {
+<span class="kw">predict_recruitment</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">stk</span>, <span class="kw">model</span>) {
 
     <span class="co"># Create the model</span>
-    <span class="no">newFL</span> <span class="kw">&lt;-</span> <span class="fu">fmle</span>(<span class="fu">as.FLSR</span>(<span class="no">stk</span>, <span class="kw">model</span><span class="kw">=</span><span class="no">model</span>))
+    <span class="kw">newFL</span> <span class="op">&lt;-</span> <span class="fu">fmle</span>(<span class="fu">as.FLSR</span>(<span class="kw">stk</span>, model=<span class="kw">model</span>))
 
     <span class="co"># Get the latest ssb</span>
-    <span class="no">ssb</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/ssb.html">ssb</a></span>(<span class="no">stk</span>), <span class="fl">1</span>)
+    <span class="kw">ssb</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="fu">ssb</span>(<span class="kw">stk</span>), <span class="fl">1</span>)
 
     <span class="co"># Predict</span>
-  <span class="no">prm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/accessors.html">params</a></span>(<span class="no">newFL</span>)
+    <span class="kw">prm</span> <span class="op">&lt;-</span> <span class="fu">params</span>(<span class="kw">newFL</span>)
 
-    <span class="no">s</span> <span class="kw">&lt;-</span> <span class="no">a</span> <span class="kw">&lt;-</span> <span class="no">prm</span><span class="kw">[[</span><span class="fl">1</span>]] <span class="co"># Extract 'a' parameter</span>
+    <span class="kw">s</span> <span class="op">&lt;-</span> <span class="kw">a</span> <span class="op">&lt;-</span> <span class="kw">prm</span>[[<span class="fl">1</span>]] <span class="co"># Extract 'a' parameter</span>
 
-  <span class="kw">if</span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">prm</span>) <span class="kw">&gt;</span> <span class="fl">1</span>)
-      <span class="no">R0</span> <span class="kw">&lt;-</span> <span class="no">b</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/accessors.html">params</a></span>(<span class="no">newFL</span>)<span class="kw">[[</span><span class="fl">2</span>]] <span class="co"># Extract 'b' parameter</span>
+    <span class="co">if</span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">prm</span>) <span class="op">&gt;</span> <span class="fl">1</span>)
+        <span class="kw">R0</span> <span class="op">&lt;-</span> <span class="kw">b</span> <span class="op">&lt;-</span> <span class="fu">params</span>(<span class="kw">newFL</span>)[[<span class="fl">2</span>]] <span class="co"># Extract 'b' parameter</span>
 
-  <span class="kw">if</span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">prm</span>) <span class="kw">&gt;</span> <span class="fl">2</span>)
-      <span class="no">v</span> <span class="kw">&lt;-</span> <span class="no">c</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/accessors.html">params</a></span>(<span class="no">newFL</span>)<span class="kw">[[</span><span class="fl">3</span>]] <span class="co"># Extract 'c' parameter</span>
+    <span class="co">if</span>(<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">prm</span>) <span class="op">&gt;</span> <span class="fl">2</span>)
+        <span class="kw">v</span> <span class="op">&lt;-</span> <span class="kw">c</span> <span class="op">&lt;-</span> <span class="fu">params</span>(<span class="kw">newFL</span>)[[<span class="fl">3</span>]] <span class="co"># Extract 'c' parameter</span>
 
     <span class="co"># Use the model formula in FLCore</span>
-    <span class="no">rec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(<span class="kw">text</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/accessors.html">model</a></span>()$<span class="no">model</span>[<span class="fl">3</span>])))
+    <span class="kw">rec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/eval.html">eval</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/parse.html">parse</a></span>(text = <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="fu">model</span>()<span class="op">$</span><span class="kw">model</span>[<span class="fl">3</span>])))
 
-    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">srmodel</span> <span class="kw">=</span> <span class="no">newFL</span>, <span class="kw">rec</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="no">rec</span>)))
+    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(srmodel = <span class="kw">newFL</span>, rec = <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span>(<span class="kw">rec</span>)))
 }
-
+</pre></div>
+</div>
+<div id="total-allowable-catch-tac-prediction-function" class="section level2">
+<h2 class="hasAnchor">
+<a href="#total-allowable-catch-tac-prediction-function" class="anchor"></a>Total allowable catch (TAC) prediction function</h2>
+<p>The following function set the next year TAC given an FLStock object, an FLIndex object, the year information and an FLR’s stock-recruitment model object. This function utilizes FLR’s FLBRP object.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit">
 <span class="co"># Predict TAC (no assessment, using real data)</span>
-<span class="no">predict_TAC</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">year</span>, <span class="no">stk</span>, <span class="no">idx</span>, <span class="no">srmodel</span>) {
+<span class="kw">predict_TAC</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">year</span>, <span class="kw">stk</span>, <span class="kw">idx</span>, <span class="kw">srmodel</span>) {
 
-  <span class="co"># Cherry-picked from: https://flr-project.org/doc/An_introduction_to_MSE_using_FLR.html</span>
-  <span class="co"># Year needs to be carefully checked</span>
+    <span class="co"># Cherry-picked from: https://flr-project.org/doc/An_introduction_to_MSE_using_FLR.html</span>
+    <span class="co"># Year needs to be carefully checked</span>
+    <span class="kw">getCtrl</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">values</span>, <span class="kw">quantity</span>, <span class="kw">years</span>, <span class="kw">it</span>){
+        <span class="kw">dnms</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(iter=<span class="fl">1</span><span class="op">:</span><span class="kw">it</span>, year=<span class="kw">years</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"min"</span>, <span class="st">"val"</span>, <span class="st">"max"</span>))
+        <span class="kw">arr0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">NA</span>, dimnames=<span class="kw">dnms</span>, dim=<span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="kw">dnms</span>, <span class="kw">length</span>)))
+        <span class="kw">arr0</span>[,,<span class="st">"val"</span>] <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="kw">values</span>)
+        <span class="kw">arr0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/aperm.html">aperm</a></span>(<span class="kw">arr0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">1</span>))
+        <span class="kw">ctrl</span> <span class="op">&lt;-</span> <span class="fu">fwdControl</span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(year=<span class="kw">years</span>, quantity=<span class="kw">quantity</span>, val=<span class="fl">NA</span>))
+        <span class="kw">ctrl</span><span class="op">@</span>trgtArray <span class="op">&lt;-</span> <span class="kw">arr0</span>
+        <span class="kw">ctrl</span>
+    }
 
-  <span class="no">getCtrl</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">values</span>, <span class="no">quantity</span>, <span class="no">years</span>, <span class="no">it</span>){
-      <span class="no">dnms</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">iter</span><span class="kw">=</span><span class="fl">1</span>:<span class="no">it</span>, <span class="kw">year</span><span class="kw">=</span><span class="no">years</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"min"</span>, <span class="st">"val"</span>, <span class="st">"max"</span>))
-      <span class="no">arr0</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html">array</a></span>(<span class="fl">NA</span>, <span class="kw">dimnames</span><span class="kw">=</span><span class="no">dnms</span>, <span class="kw">dim</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="no">dnms</span>, <span class="no">length</span>)))
-      <span class="no">arr0</span>[,,<span class="st">"val"</span>] <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unlist.html">unlist</a></span>(<span class="no">values</span>)
-      <span class="no">arr0</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/aperm.html">aperm</a></span>(<span class="no">arr0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">2</span>,<span class="fl">3</span>,<span class="fl">1</span>))
-      <span class="no">ctrl</span> <span class="kw">&lt;-</span> <span class="fu">fwdControl</span>(<span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="kw">year</span><span class="kw">=</span><span class="no">years</span>, <span class="kw">quantity</span><span class="kw">=</span><span class="no">quantity</span>, <span class="kw">val</span><span class="kw">=</span><span class="fl">NA</span>))
-      <span class="no">ctrl</span>@<span class="kw">trgtArray</span> <span class="kw">&lt;-</span> <span class="no">arr0</span>
-      <span class="no">ctrl</span>
-  }
+    <span class="kw">brp</span> <span class="op">&lt;-</span> <span class="fu">brp</span>(<span class="fu">FLBRP</span>(<span class="kw">stk</span>, <span class="kw">srmodel</span>))
+    <span class="kw">Fmsy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu">refpts</span>(<span class="kw">brp</span>)[<span class="st">"msy"</span>,<span class="st">"harvest"</span>])
+    <span class="kw">msy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu">refpts</span>(<span class="kw">brp</span>)[<span class="st">"msy"</span>,<span class="st">"yield"</span>])
+    <span class="kw">Bmsy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu">refpts</span>(<span class="kw">brp</span>)[<span class="st">"msy"</span>,<span class="st">"ssb"</span>])
+    <span class="kw">Bpa</span> <span class="op">&lt;-</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="kw">Bmsy</span>
+    <span class="kw">Blim</span> <span class="op">&lt;-</span> <span class="kw">Bpa</span> <span class="op">/</span> <span class="fl">1.4</span>
 
-  <span class="no">brp</span> <span class="kw">&lt;-</span> <span class="fu">brp</span>(<span class="fu"><a href="https://rdrr.io/pkg/FLBRP/man/FLBRP.html">FLBRP</a></span>(<span class="no">stk</span>, <span class="no">srmodel</span>))
-  <span class="no">Fmsy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu">refpts</span>(<span class="no">brp</span>)[<span class="st">"msy"</span>,<span class="st">"harvest"</span>])
-  <span class="no">msy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu">refpts</span>(<span class="no">brp</span>)[<span class="st">"msy"</span>,<span class="st">"yield"</span>])
-  <span class="no">Bmsy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu">refpts</span>(<span class="no">brp</span>)[<span class="st">"msy"</span>,<span class="st">"ssb"</span>])
-  <span class="no">Bpa</span> <span class="kw">&lt;-</span> <span class="fl">0.5</span> * <span class="no">Bmsy</span>
-  <span class="no">Blim</span> <span class="kw">&lt;-</span> <span class="no">Bpa</span> / <span class="fl">1.4</span>
+    <span class="kw">flag</span> <span class="op">&lt;-</span> <span class="fu">ssb</span>(<span class="kw">stk</span>)[, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="kw">year</span> <span class="op">-</span> <span class="fl">1</span>)] <span class="op">&lt;</span> <span class="kw">Bpa</span>
+    <span class="kw">Ftrgt</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span>(<span class="kw">flag</span>, <span class="fu">ssb</span>(<span class="kw">stk</span>)[, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="kw">year</span> <span class="op">-</span> <span class="fl">1</span>)] <span class="op">*</span> <span class="kw">Fmsy</span> <span class="op">/</span> <span class="kw">Bpa</span>, <span class="kw">Fmsy</span>)
 
-  <span class="no">flag</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/ssb.html">ssb</a></span>(<span class="no">stk</span>)[, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">year</span> - <span class="fl">1</span>)] <span class="kw">&lt;</span> <span class="no">Bpa</span>
-  <span class="no">Ftrgt</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span>(<span class="no">flag</span>, <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/ssb.html">ssb</a></span>(<span class="no">stk</span>)[, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">year</span> - <span class="fl">1</span>)] * <span class="no">Fmsy</span> / <span class="no">Bpa</span>, <span class="no">Fmsy</span>)
+    <span class="kw">sqy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>((<span class="kw">year</span> <span class="op">-</span> <span class="fl">3</span>)<span class="op">:</span>(<span class="kw">year</span><span class="op">-</span><span class="fl">1</span>)))
+    <span class="kw">fsq</span> <span class="op">&lt;-</span> <span class="fu">yearMeans</span>(<span class="fu">fbar</span>(<span class="kw">stk</span>)[, <span class="kw">sqy</span>]) <span class="co"># Use status quo</span>
+    <span class="kw">ctrl</span> <span class="op">&lt;-</span> <span class="fu">getCtrl</span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">fsq</span>, <span class="kw">Ftrgt</span>), <span class="st">"f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">year</span>, <span class="kw">year</span> <span class="op">+</span> <span class="fl">1</span>), <span class="fl">1</span>)
+    <span class="kw">stk</span> <span class="op">&lt;-</span> <span class="fu">stf</span>(<span class="kw">stk</span>, <span class="fl">2</span>)
+    <span class="kw">gmean_rec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fu">yearMeans</span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fu">rec</span>(<span class="kw">stk</span>)))))
+    <span class="kw">stk</span> <span class="op">&lt;-</span> <span class="fu">fwd</span>(<span class="kw">stk</span>, control=<span class="kw">ctrl</span>, sr=<span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(model=<span class="st">"mean"</span>, params = <span class="fu">FLPar</span>(<span class="kw">gmean_rec</span>,iter=<span class="fl">1</span>)))
 
-  <span class="no">sqy</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>((<span class="no">year</span> - <span class="fl">3</span>):(<span class="no">year</span>-<span class="fl">1</span>)))
-  <span class="no">fsq</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/dimSummaries.html">yearMeans</a></span>(<span class="fu">fbar</span>(<span class="no">stk</span>)[, <span class="no">sqy</span>]) <span class="co"># Use status quo</span>
-  <span class="no">ctrl</span> <span class="kw">&lt;-</span> <span class="fu">getCtrl</span>(<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">fsq</span>, <span class="no">Ftrgt</span>), <span class="st">"f"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">year</span>, <span class="no">year</span> + <span class="fl">1</span>), <span class="fl">1</span>)
-  <span class="no">stk</span> <span class="kw">&lt;-</span> <span class="fu">stf</span>(<span class="no">stk</span>, <span class="fl">2</span>)
-  <span class="no">gmean_rec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/dimSummaries.html">yearMeans</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/accessors.html">rec</a></span>(<span class="no">stk</span>)))))
-  <span class="no">stk</span> <span class="kw">&lt;-</span> <span class="fu">fwd</span>(<span class="no">stk</span>, <span class="kw">control</span><span class="kw">=</span><span class="no">ctrl</span>, <span class="kw">sr</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>(<span class="kw">model</span><span class="kw">=</span><span class="st">"mean"</span>, <span class="kw">params</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/FLPar.html">FLPar</a></span>(<span class="no">gmean_rec</span>,<span class="kw">iter</span><span class="kw">=</span><span class="fl">1</span>)))
+    <span class="kw">TAC</span> <span class="op">&lt;-</span> <span class="fu">catch</span>(<span class="kw">stk</span>)[, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="kw">year</span>)]
 
-  <span class="no">TAC</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/accessors.html">catch</a></span>(<span class="no">stk</span>)[, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">year</span>)]
-
-    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">TAC</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw">TAC</span>)
 }
+</pre></div>
+</div>
+<div id="the-main-mse-loop-code" class="section level2">
+<h2 class="hasAnchor">
+<a href="#the-main-mse-loop-code" class="anchor"></a>The main MSE loop code</h2>
+<p>The following code is the main MSE loop code for a single MSE run. This function accepts the parameter object and a selected stock-recruitment model object from the FLCore package (e.g., <code>bevholt</code>, <code>ricker</code>).</p>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="kw">runHadSingle</span> <span class="op">&lt;-</span> <span class="fu">function</span>(<span class="kw">params</span>, <span class="kw">modelsel</span>) {
 
-
-
-<span class="no">runHadSingle</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">params</span>, <span class="no">modelsel</span>) {
-
-  <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">FLCore</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">FLBRP</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">FLash</span>)
-  <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gadgetr</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://flr-project.org/FLCore">FLCore</a></span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://flr-project.org/FLBRP">FLBRP</a></span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">FLash</span>)
+    <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">gadgetr</span>)
 
     <span class="co"># Clean any prior gadget run</span>
     <span class="fu"><a href="../reference/endGadget.html">endGadget</a></span>()
 
     <span class="co"># Get the path of the example haddock data</span>
-    <span class="no">exPath</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/loadExample.html">loadExample</a></span>()
+    <span class="kw">exPath</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/loadExample.html">loadExample</a></span>()
 
     <span class="co"># Init the haddock model</span>
-    <span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="no">exPath</span>, <span class="st">"refinputfile"</span>)
+    <span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="kw">exPath</span>, <span class="st">"refinputfile"</span>)
 
     <span class="co"># Run the hindcast period</span>
-    <span class="no">gadgetFLR</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/runUntil.html">runUntil</a></span>(<span class="no">params</span><span class="kw">[[</span><span class="st">"projYear"</span>]] - <span class="fl">1</span>, <span class="no">params</span>)
+    <span class="kw">gadgetFLR</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/runUntil.html">runUntil</a></span>(<span class="kw">params</span>[[<span class="st">"projYear"</span>]] <span class="op">-</span> <span class="fl">1</span>, <span class="kw">params</span>)
 
-  <span class="no">yrList</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">params</span><span class="kw">[[</span><span class="st">"projYear"</span>]]:<span class="no">params</span><span class="kw">[[</span><span class="st">"finalYear"</span>]])
+    <span class="kw">yrList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">params</span>[[<span class="st">"projYear"</span>]]<span class="op">:</span><span class="kw">params</span>[[<span class="st">"finalYear"</span>]])
 
-    <span class="kw">for</span>(<span class="no">year</span> <span class="kw">in</span> <span class="no">yrList</span>) {
-        <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">year</span>)
+    <span class="co">for</span>(<span class="kw">year</span> <span class="co">in</span> <span class="kw">yrList</span>) {
+        <span class="co"># Loop through unique stocks</span>
+        <span class="co">for</span>(<span class="kw">sp</span> <span class="co">in</span> <span class="kw">params</span><span class="op">$</span><span class="kw">stockList</span>) {
+            <span class="co"># Predict and update recruitment</span>
+            <span class="kw">pr</span> <span class="op">&lt;-</span> <span class="fu">predict_recruitment</span>(<span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">stk</span>, model = <span class="kw">modelsel</span>)
+            <span class="kw">rec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="kw">pr</span><span class="op">$</span><span class="kw">rec</span><span class="op">/</span><span class="fl">10000</span>)
+            <span class="fu"><a href="../reference/updateRenewal.html">updateRenewal</a></span>(<span class="kw">sp</span>, <span class="kw">year</span>, step = <span class="fl">1</span>, area = <span class="fl">1</span>, age = <span class="fl">1</span>,
+                number = <span class="kw">rec</span>, mean = <span class="fl">16.41</span>, sdev = <span class="fl">2.25</span> ,
+                alpha = <span class="fl">8.85e-6</span>, beta = <span class="fl">3.0257</span>)
 
-    <span class="co"># Loop through unique stocks</span>
-    <span class="kw">for</span>(<span class="no">sp</span> <span class="kw">in</span> <span class="no">params</span>$<span class="no">stockList</span>) {
-      <span class="co"># Predict and update recruitment</span>
-          <span class="no">pr</span> <span class="kw">&lt;-</span> <span class="fu">predict_recruitment</span>(<span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span>, <span class="kw">model</span> <span class="kw">=</span> <span class="no">modelsel</span>)
-      <span class="no">rec</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span>(<span class="no">pr</span>$<span class="no">rec</span>/<span class="fl">10000</span>)
-          <span class="fu"><a href="../reference/updateRenewal.html">updateRenewal</a></span>(<span class="no">sp</span>, <span class="no">year</span>, <span class="kw">step</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">area</span> <span class="kw">=</span> <span class="fl">1</span>, <span class="kw">age</span> <span class="kw">=</span> <span class="fl">1</span>,
-            <span class="kw">number</span> <span class="kw">=</span> <span class="no">rec</span>, <span class="kw">mean</span> <span class="kw">=</span> <span class="fl">16.41</span>, <span class="kw">sdev</span> <span class="kw">=</span> <span class="fl">2.25</span> ,
-                <span class="kw">alpha</span> <span class="kw">=</span> <span class="fl">8.85e-6</span>, <span class="kw">beta</span> <span class="kw">=</span> <span class="fl">3.0257</span>)
+            <span class="co"># Predict TAC and update catch (spreads throughout 4 seasons/steps)</span>
+            <span class="kw">tac</span> <span class="op">&lt;-</span> <span class="fu">predict_TAC</span>(<span class="kw">year</span>, <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">stk</span>, <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">idx</span>, <span class="kw">pr</span><span class="op">$</span><span class="kw">srmodel</span>)
+            <span class="kw">tacPortion</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.232</span>, <span class="fl">0.351</span>, <span class="fl">0.298</span>, <span class="fl">0.119</span>)
+            <span class="kw">targetFleet</span> <span class="op">&lt;-</span> <span class="kw">params</span>[[<span class="kw">sp</span>]][[<span class="st">"forecasts"</span>]]
+            <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="kw">targetFleet</span>, <span class="kw">year</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="kw">tacPortion</span>[[<span class="fl">1</span>]] <span class="op">*</span> <span class="kw">tac</span>)
+            <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="kw">targetFleet</span>, <span class="kw">year</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="kw">tacPortion</span>[[<span class="fl">2</span>]] <span class="op">*</span> <span class="kw">tac</span>)
+            <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="kw">targetFleet</span>, <span class="kw">year</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="kw">tacPortion</span>[[<span class="fl">3</span>]] <span class="op">*</span> <span class="kw">tac</span>)
+            <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="kw">targetFleet</span>, <span class="kw">year</span>, <span class="fl">4</span>, <span class="fl">1</span>, <span class="kw">tacPortion</span>[[<span class="fl">4</span>]] <span class="op">*</span> <span class="kw">tac</span>)
+        }
 
-      <span class="co"># Predict and update catch</span>
-          <span class="no">tac</span> <span class="kw">&lt;-</span> <span class="fu">predict_TAC</span>(<span class="no">year</span>, <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span>, <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span>, <span class="no">pr</span>$<span class="no">srmodel</span>)
-      <span class="no">tacPortion</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">0.232</span>, <span class="fl">0.351</span>, <span class="fl">0.298</span>, <span class="fl">0.119</span>)
-      <span class="no">targetFleet</span> <span class="kw">&lt;-</span> <span class="no">params</span><span class="kw">[[</span><span class="no">sp</span>]]<span class="kw">[[</span><span class="st">"forecasts"</span>]]
-      <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="no">targetFleet</span>, <span class="no">year</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="no">tacPortion</span><span class="kw">[[</span><span class="fl">1</span>]] * <span class="no">tac</span>)
-      <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="no">targetFleet</span>, <span class="no">year</span>, <span class="fl">2</span>, <span class="fl">1</span>, <span class="no">tacPortion</span><span class="kw">[[</span><span class="fl">2</span>]] * <span class="no">tac</span>)
-      <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="no">targetFleet</span>, <span class="no">year</span>, <span class="fl">3</span>, <span class="fl">1</span>, <span class="no">tacPortion</span><span class="kw">[[</span><span class="fl">3</span>]] * <span class="no">tac</span>)
-      <span class="fu"><a href="../reference/updateAmount.html">updateAmount</a></span>(<span class="no">targetFleet</span>, <span class="no">year</span>, <span class="fl">4</span>, <span class="fl">1</span>, <span class="no">tacPortion</span><span class="kw">[[</span><span class="fl">4</span>]] * <span class="no">tac</span>)
+        <span class="co"># Forward a year</span>
+        <span class="kw">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/runYear.html">runYear</a></span>()
+
+        <span class="co"># Loop through unique stocks to update the FLR objects</span>
+        <span class="co">for</span>(<span class="kw">sp</span> <span class="co">in</span> <span class="kw">params</span><span class="op">$</span><span class="kw">stockList</span>) {
+        <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">stk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/window.html">window</a></span>(<span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">stk</span>, end = <span class="kw">year</span>)
+        <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">idx</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/window.html">window</a></span>(<span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">idx</span>, end = <span class="kw">year</span>)
+
+        <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]] <span class="op">&lt;-</span> <span class="fu"><a href="../reference/updateFLStock.html">updateFLStock</a></span>(<span class="kw">sp</span>, <span class="kw">out</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="kw">year</span>),
+            <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">stk</span>, <span class="kw">gadgetFLR</span>[[<span class="kw">sp</span>]]<span class="op">$</span><span class="kw">idx</span>, <span class="kw">params</span>)
+        }
     }
-
-    <span class="co"># Forward a year</span>
-    <span class="no">out</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/runYear.html">runYear</a></span>()
-
-    <span class="co"># Loop through unique stocks to update the FLR objects</span>
-    <span class="kw">for</span>(<span class="no">sp</span> <span class="kw">in</span> <span class="no">params</span>$<span class="no">stockList</span>) {
-      <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/window.html">window</a></span>(<span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">year</span>)
-      <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/window.html">window</a></span>(<span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span>, <span class="kw">end</span> <span class="kw">=</span> <span class="no">year</span>)
-
-      <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]] <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/updateFLStock.html">updateFLStock</a></span>(<span class="no">sp</span>, <span class="no">out</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html">as.character</a></span>(<span class="no">year</span>),
-          <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">stk</span>, <span class="no">gadgetFLR</span><span class="kw">[[</span><span class="no">sp</span>]]$<span class="no">idx</span>, <span class="no">params</span>)
-    }
-    }
-
-  <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="no">gadgetFLR</span>)
-
+    <span class="fu"><a href="https://rdrr.io/r/base/function.html">return</a></span>(<span class="kw">gadgetFLR</span>)
 }
-
-
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">parallel</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">FLCore</span>)
+</pre></div>
+</div>
+<div id="the-driver-code-for-the-parallel-mse-runs" class="section level2">
+<h2 class="hasAnchor">
+<a href="#the-driver-code-for-the-parallel-mse-runs" class="anchor"></a>The driver code for the parallel MSE runs</h2>
+<p>The main parallel execution code is using <code><a href="https://rdrr.io/r/parallel/clusterApply.html">parLapply()</a></code> calling <code>runHadSingle()</code> with a list object of different FLCore’s stock-recruitment models and the <code>params</code> object.</p>
+<p>In the code below we will run the simple MSE with <code>bevholt</code>, <code>ricker</code>, <code>geomean</code>, <code>segreg</code>, <code>bevholtAR1</code>, <code>rickerAR1</code> and <code>segregAR1</code> recruitment models in parallel. The result of the MSE runs is collated into different iterations inside an FLStock object.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">parallel</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://flr-project.org/FLCore">FLCore</a></span>)
 <span class="co">#&gt; Loading required package: lattice</span>
 <span class="co">#&gt; Loading required package: iterators</span>
 <span class="co">#&gt; FLCore (Version 2.6.15, packaged: 2020-05-27 21:04:10 UTC)</span>
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplotFL</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw"><a href="http://flr-project.org/ggplotFL">ggplotFL</a></span>)
 <span class="co">#&gt; Loading required package: ggplot2</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Attaching package: 'ggplot2'</span>
@@ -292,50 +337,66 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt;     %+%</span>
 
-<span class="no">chk</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span>(<span class="st">"_R_CHECK_LIMIT_CORES_"</span>, <span class="st">""</span>)
+<span class="co"># Set the number of workers</span>
+<span class="kw">chk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html">Sys.getenv</a></span>(<span class="st">"_R_CHECK_LIMIT_CORES_"</span>, <span class="st">""</span>)
 
-<span class="kw">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nzchar</a></span>(<span class="no">chk</span>) <span class="kw">&amp;&amp;</span> <span class="no">chk</span> <span class="kw">==</span> <span class="st">"TRUE"</span>) {
+<span class="co">if</span> (<span class="fu"><a href="https://rdrr.io/r/base/nchar.html">nzchar</a></span>(<span class="kw">chk</span>) <span class="op">&amp;&amp;</span> <span class="kw">chk</span> <span class="op">==</span> <span class="st">"TRUE"</span>) {
     <span class="co"># use 2 cores in CRAN/actions</span>
-    <span class="no">num_workers</span> <span class="kw">&lt;-</span> <span class="fl">2L</span>
-} <span class="kw">else</span> {
-    <span class="co"># use all cores in devtools::test()</span>
-    <span class="no">num_workers</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span>()
+    <span class="kw">num_workers</span> <span class="op">&lt;-</span> <span class="fl">2L</span>
+} <span class="co">else</span> {
+    <span class="co"># use all cores in devtools::test() and others</span>
+    <span class="kw">num_workers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/detectCores.html">detectCores</a></span>()
 }
 
-<span class="no">cl</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span>(<span class="no">num_workers</span>, <span class="kw">type</span> <span class="kw">=</span> <span class="st">"PSOCK"</span>)
+<span class="co"># Make cluster</span>
+<span class="kw">cl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">makeCluster</a></span>(<span class="kw">num_workers</span>, type = <span class="st">"PSOCK"</span>)
 
-<span class="no">params</span> <span class="kw">&lt;-</span> <span class="fu">parameterize</span>()
+<span class="co"># Covert exhaustive list of parameters into a parameter list object</span>
+<span class="kw">params</span> <span class="op">&lt;-</span> <span class="fu">parameterize</span>()
 
 <span class="co"># Export functions and simulation parameter</span>
-<span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html">clusterExport</a></span>(<span class="no">cl</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"runHadSingle"</span>, <span class="st">"predict_TAC"</span>,
+<span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html">clusterExport</a></span>(<span class="kw">cl</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"runHadSingle"</span>, <span class="st">"predict_TAC"</span>, 
                       <span class="st">"predict_recruitment"</span>, <span class="st">"params"</span>))
 
 <span class="co"># Try to run with many different recruitment models in parallel</span>
-<span class="no">models</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="no">bevholt</span>, <span class="no">ricker</span>, <span class="no">cushing</span>, <span class="no">geomean</span>, <span class="no">segreg</span>, <span class="no">shepherd</span>, <span class="no">bevholtAR1</span>,
-            <span class="no">rickerAR1</span>, <span class="no">segregAR1</span>)
-<span class="no">result</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html">parLapply</a></span>(<span class="no">cl</span>, <span class="no">models</span>, <span class="kw">function</span>(<span class="no">x</span>) <span class="fu">runHadSingle</span>(<span class="no">params</span>, <span class="no">x</span>))
+<span class="kw">models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="kw">bevholt</span>, <span class="kw">ricker</span>, <span class="kw">geomean</span>, <span class="kw">segreg</span>, <span class="kw">bevholtAR1</span>,
+            <span class="kw">rickerAR1</span>, <span class="kw">segregAR1</span>)
+<span class="kw">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/parallel/clusterApply.html">parLapply</a></span>(<span class="kw">cl</span>, <span class="kw">models</span>, <span class="fu">function</span>(<span class="kw">x</span>) <span class="fu">runHadSingle</span>(<span class="kw">params</span>, <span class="kw">x</span>))
 
-<span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span>(<span class="no">cl</span>)
+<span class="co"># Stop cluster</span>
+<span class="fu"><a href="https://rdrr.io/r/parallel/makeCluster.html">stopCluster</a></span>(<span class="kw">cl</span>)
 
-<span class="co"># plot it</span>
-<span class="no">had.stk</span> <span class="kw">&lt;-</span> <span class="no">result</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">had</span>$<span class="no">stk</span>
-<span class="no">had.stk</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/propagate.html">propagate</a></span>(<span class="no">had.stk</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">models</span>))
+<span class="co"># Make a single FLStock object for the results</span>
+<span class="kw">had.stk</span> <span class="op">&lt;-</span> <span class="kw">result</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">had</span><span class="op">$</span><span class="kw">stk</span>
+<span class="kw">had.stk</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/propagate.html">propagate</a></span>(<span class="kw">had.stk</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">models</span>))
 
-<span class="kw">for</span>(<span class="no">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span>:<span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">models</span>))) {
-  <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/iter.html">iter</a></span>(<span class="no">had.stk</span>, <span class="no">i</span>) <span class="kw">&lt;-</span> <span class="no">result</span><span class="kw">[[</span><span class="no">i</span>]]$<span class="no">had</span>$<span class="no">stk</span>
-}</pre></body></html></div>
-<div class="sourceCode" id="cb2"><html><body><pre class="r">
-<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/plot.html">plot</a></span>(<span class="no">had.stk</span>)</pre></body></html></div>
+<span class="co"># Store different run results in different FLStock iterations</span>
+<span class="co">for</span>(<span class="kw">i</span> <span class="co">in</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="kw">models</span>))) {
+    <span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/iter.html">iter</a></span>(<span class="kw">had.stk</span>, <span class="kw">i</span>) <span class="op">&lt;-</span> <span class="kw">result</span>[[<span class="kw">i</span>]]<span class="op">$</span><span class="kw">had</span><span class="op">$</span><span class="kw">stk</span>
+}
+</pre></div>
+</div>
+<div id="plot-the-results" class="section level2">
+<h2 class="hasAnchor">
+<a href="#plot-the-results" class="anchor"></a>Plot the results</h2>
+<p>Plot the result using FLR’s ggplotFL tool.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/plot.html">plot</a></span>(<span class="kw">had.stk</span>)
+</pre></div>
 <div class="figure">
 <img src="gadget-flr_files/figure-html/plot-1.png" alt="Haddock model prediction using several different stock recruitment models" width="672"><p class="caption">
 Haddock model prediction using several different stock recruitment models
 </p>
 </div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
@@ -346,7 +407,7 @@ Haddock model prediction using several different stock recruitment models
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

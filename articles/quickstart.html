@@ -31,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">gadgetr</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.3</span>
       </span>
     </div>
 
@@ -60,7 +60,7 @@
       <a href="../articles/quickstart.html">GadgetR: Quick Start Guide</a>
     </li>
     <li>
-      <a href="../articles/simplemse.html">GadgetR: Quick and Dirty Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
+      <a href="../articles/simplemse.html">GadgetR: (Very) Simple short-cut Management Strategy Evaluation (MSE) using Gadget as the Operating Model (OM)</a>
     </li>
   </ul>
 </li>
@@ -81,7 +81,7 @@
       <h1 data-toc-skip>GadgetR: Quick Start Guide</h1>
                         <h4 class="author">Ibrahim Umar</h4>
             
-            <h4 class="date">2020-08-18</h4>
+            <h4 class="date">2020-09-15</h4>
       
       
       <div class="hidden name"><code>quickstart.Rmd</code></div>
@@ -98,45 +98,54 @@
 <p>Or, you can download and install from the pre-compiled binaries here:</p>
 <pre><code>https://github.com/REDUS-IMR/gadget/releases/latest</code></pre>
 <p>Or, you might want to compile it from the source available in Github:</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu">install_github</span>(<span class="st">"REDUS-IMR/gadget"</span>, <span class="kw">ref</span><span class="kw">=</span><span class="st">"gadgetr"</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="kw">devtools</span>::<span class="fu">install_github</span>(<span class="st">"REDUS-IMR/gadget"</span>, ref=<span class="st">"gadgetr"</span>)
+</pre></div>
 </div>
-<div id="running-the-sample-haddock-model" class="section level1">
+<div id="running-the-example-haddock-model" class="section level1">
 <h1 class="hasAnchor">
-<a href="#running-the-sample-haddock-model" class="anchor"></a>Running the sample Haddock model</h1>
-<p>This guide demonstrates the gadgetr library ability of controlling a gadget model run and extracting the relevant information from the run.</p>
+<a href="#running-the-example-haddock-model" class="anchor"></a>Running the example Haddock model</h1>
+<p>This guide demonstrates gadgetr’s capability of controlling a gadget model run and extracting relevant information during the run. To run simulations, GadgetR requires a gadget model as ‘input’ (normally a set of text files). In this tutorial, we demonstrate how you set up and run GadgetR simulations using a simple haddock <a href="https://github.com/Hafro/gadget2/blob/master/examples/haddock.md">model</a> by James Begley.</p>
 <div id="loading-the-package" class="section level2">
 <h2 class="hasAnchor">
 <a href="#loading-the-package" class="anchor"></a>Loading the package</h2>
 <p>After installing, the following command will load the library.</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">gadgetr</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="kw">gadgetr</span>)
+</pre></div>
 </div>
 <div id="loading-the-example-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#loading-the-example-model" class="anchor"></a>Loading the example model</h2>
 <p>The library ships with an example haddock model. What we need to do is calling <code><a href="../reference/loadExample.html">loadExample()</a></code> to obtain the full path of the model.</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="co"># Get the path of the example haddock data</span>
-<span class="no">exPath</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/loadExample.html">loadExample</a></span>()
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">exPath</span>)
-<span class="co">#&gt; [1] "/home/runner/work/_temp/Library/gadgetr/extdata/haddock"</span></pre></body></html></div>
-<p>To initialize a gadget run, we have to specify the full path of the model and also the input file. In the example model, the input file is the file named <code>refinputfile</code>.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="co"># Init the haddock model</span>
-<span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="no">exPath</span>, <span class="st">"refinputfile"</span>)
-<span class="co">#&gt; Gadget version 2.2.00-BETA running on fv-az19 Tue Aug 18 21:06:39 2020</span>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># Get the path of the example haddock data</span>
+<span class="kw">exPath</span> <span class="op">&lt;-</span> <span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/loadExample.html">loadExample</a></span>()
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">exPath</span>)
+<span class="co">#&gt; [1] "/home/runner/work/_temp/Library/gadgetr/extdata/haddock"</span>
+</pre></div>
+<p>To initialize a gadgetR run, we have to specify the full path of the model folder and input (parameter) file. In the example model, the input file is the file named  <code>refinputfile</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="co"># Initiate the haddock model</span>
+<span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/initGadget.html">initGadget</a></span>(<span class="kw">exPath</span>, <span class="st">"refinputfile"</span>)
+<span class="co">#&gt; Gadget version 2.2.00-BETA running on fv-az82 Tue Sep 15 12:17:30 2020</span>
 <span class="co">#&gt; Starting Gadget from directory: /home/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
 <span class="co">#&gt; using data from directory: /home/runner/work/_temp/Library/gadgetr/extdata/haddock</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Finished reading model data files, starting to run simulation</span>
 <span class="co">#&gt; [1] "Gadget is started with the given model in /home/runner/work/_temp/Library/gadgetr/extdata/haddock."</span>
-<span class="co">#&gt; NULL</span></pre></body></html></div>
+<span class="co">#&gt; NULL</span>
+</pre></div>
 <p>The <code><a href="../reference/initGadget.html">initGadget()</a></code> function instructs gadget to load the model and preparing the internal data structure. If successful, the model is now ready to be run.</p>
 </div>
 <div id="printing-the-model-ecosystem-information" class="section level2">
 <h2 class="hasAnchor">
 <a href="#printing-the-model-ecosystem-information" class="anchor"></a>Printing the model ecosystem information</h2>
-<p>Now that the model is loaded, we might want to inspect some of the important objects in the simulation. The <code><a href="../reference/getEcosystemInfo.html">getEcosystemInfo()</a></code> is a useful function that provides this type of information.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="co"># Get the initial information</span>
-<span class="no">initial</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">initial</span>)
+<p>Now that the model is loaded, we can inspect some of the important objects in the simulation. The <code><a href="../reference/getEcosystemInfo.html">getEcosystemInfo()</a></code> is a useful function that provides this type of information.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="co"># Get the initial information</span>
+<span class="kw">initial</span> <span class="op">&lt;-</span> <span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">initial</span>)
 <span class="co">#&gt; $fleet</span>
 <span class="co">#&gt; [1] "comm"   "survey" "future"</span>
 <span class="co">#&gt; </span>
@@ -148,77 +157,81 @@
 <span class="co">#&gt;           1        1978           1         172           0</span>
 
 <span class="co"># Print start year</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">initial</span>$<span class="no">time</span>[<span class="st">"currentYear"</span>])
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">initial</span><span class="op">$</span><span class="kw">time</span>[<span class="st">"currentYear"</span>])
 <span class="co">#&gt; currentYear </span>
 <span class="co">#&gt;        1978</span>
 <span class="co"># Print initial step number</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">initial</span>$<span class="no">time</span>[<span class="st">"currentTime"</span>])
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">initial</span><span class="op">$</span><span class="kw">time</span>[<span class="st">"currentTime"</span>])
 <span class="co">#&gt; currentTime </span>
 <span class="co">#&gt;           1</span>
 <span class="co"># Print final step number</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">initial</span>$<span class="no">time</span>[<span class="st">"totalSteps"</span>])
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">initial</span><span class="op">$</span><span class="kw">time</span>[<span class="st">"totalSteps"</span>])
 <span class="co">#&gt; totalSteps </span>
-<span class="co">#&gt;        172</span></pre></body></html></div>
+<span class="co">#&gt;        172</span>
+</pre></div>
 </div>
 <div id="moving-the-simulation-forward" class="section level2">
 <h2 class="hasAnchor">
 <a href="#moving-the-simulation-forward" class="anchor"></a>Moving the simulation forward</h2>
-<p>As we can see in the previous section, the sample haddock model has a certain number of simulation steps. Now let’s loop through the time steps while collecting the important metrics from the fleets and the stocks.</p>
-<p>The package provides two alternative functions to forward the simulation time. These functions are <code><a href="../reference/runStep.html">runStep()</a></code> and <code><a href="../reference/runYear.html">runYear()</a></code>, which forward the simulation by a step and a year, respectively. Both functions returns the metrics from both stocks and fleets objects at that particular step or year.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="co"># Variable for counting step</span>
-<span class="no">lengthStep</span> <span class="kw">&lt;-</span> <span class="fl">1</span>
+<p>As we can see in the previous section, the example haddock model has a certain number of simulation steps. Now let’s loop through the time steps while collecting the important metrics from the fleets and the stocks.</p>
+<p>The package provides two alternative functions to forward the simulation time. These functions are <code><a href="../reference/runStep.html">runStep()</a></code> and <code><a href="../reference/runYear.html">runYear()</a></code>, which forward the simulation by step and year, respectively. Both functions return the metrics from both stocks and fleets objects at a particular step or year.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit">
+<span class="co"># Variable for counting step</span>
+<span class="kw">lengthStep</span> <span class="op">&lt;-</span> <span class="fl">1</span>
 
 <span class="co"># Loop for all steps</span>
-<span class="no">stats</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
-<span class="kw">while</span> (<span class="fl">TRUE</span>){
+<span class="kw">stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span>()
+<span class="co">while</span> (<span class="fl">TRUE</span>){
   <span class="co"># Append stats</span>
-  <span class="no">stats</span><span class="kw">[[</span><span class="no">lengthStep</span>]] <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/runStep.html">runStep</a></span>()
+  <span class="kw">stats</span>[[<span class="kw">lengthStep</span>]] <span class="op">&lt;-</span> <span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/runStep.html">runStep</a></span>()
   <span class="co"># Stop at the end of time</span>
-  <span class="no">status</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
-  <span class="kw">if</span>(<span class="no">status</span><span class="kw">[[</span><span class="st">"time"</span>]][<span class="st">"finished"</span>] <span class="kw">==</span> <span class="fl">1</span>) <span class="kw">break</span>
-  <span class="no">lengthStep</span> <span class="kw">&lt;-</span> <span class="no">lengthStep</span> + <span class="fl">1</span>
+  <span class="kw">status</span> <span class="op">&lt;-</span> <span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
+  <span class="co">if</span>(<span class="kw">status</span>[[<span class="st">"time"</span>]][<span class="st">"finished"</span>] <span class="op">==</span> <span class="fl">1</span>) <span class="co">break</span>
+  <span class="kw">lengthStep</span> <span class="op">&lt;-</span> <span class="kw">lengthStep</span> <span class="op">+</span> <span class="fl">1</span>
 }
 
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">lengthStep</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">lengthStep</span>)
 <span class="co">#&gt; [1] 172</span>
 
 <span class="co"># Get termination information</span>
-<span class="no">term</span> <span class="kw">&lt;-</span> <span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
+<span class="kw">term</span> <span class="op">&lt;-</span> <span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/getEcosystemInfo.html">getEcosystemInfo</a></span>()
 
 <span class="co"># Print end year</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">term</span>$<span class="no">time</span>[<span class="st">"currentYear"</span>])
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">term</span><span class="op">$</span><span class="kw">time</span>[<span class="st">"currentYear"</span>])
 <span class="co">#&gt; currentYear </span>
 <span class="co">#&gt;        2020</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">initial</span>$<span class="no">time</span>[<span class="st">"currentYear"</span>] + (<span class="no">lengthStep</span> / <span class="fl">4</span>) - <span class="fl">1</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">initial</span><span class="op">$</span><span class="kw">time</span>[<span class="st">"currentYear"</span>] <span class="op">+</span> (<span class="kw">lengthStep</span> <span class="op">/</span> <span class="fl">4</span>) <span class="op">-</span> <span class="fl">1</span>)
 <span class="co">#&gt; currentYear </span>
 <span class="co">#&gt;        2020</span>
 
 <span class="co"># Print last step number</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">term</span>$<span class="no">time</span>[<span class="st">"currentTime"</span>])
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">term</span><span class="op">$</span><span class="kw">time</span>[<span class="st">"currentTime"</span>])
 <span class="co">#&gt; currentTime </span>
 <span class="co">#&gt;         172</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">lengthStep</span>)
-<span class="co">#&gt; [1] 172</span></pre></body></html></div>
-<p>In the above code, a condition <code>status[["time"]]["finished"] == 1</code> terminates the loop. The <code><a href="../reference/getEcosystemInfo.html">getEcosystemInfo()</a></code> gives an updated status of the model run whenever it called. It also gives an information whether the simulation has reached to an end.</p>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">lengthStep</span>)
+<span class="co">#&gt; [1] 172</span>
+</pre></div>
+<p>In the above code, a condition <code>status[["time"]]["finished"] == 1</code> terminates the loop. The <code><a href="../reference/getEcosystemInfo.html">getEcosystemInfo()</a></code> gives an updated status of the model run whenever it is called. It also gives information whether the simulation has reached to an end.</p>
 <p>You may also safely replace the <code><a href="../reference/runStep.html">runStep()</a></code> with <code><a href="../reference/runYear.html">runYear()</a></code> in the above code. However, the metrics content in the <code>stats</code> objects will not be broke down into steps as you might have with <code><a href="../reference/runStep.html">runStep()</a></code> function. This is because <code><a href="../reference/runYear.html">runYear()</a></code> function will aggregate the steps’ metrics from the model’s objects.</p>
 </div>
 <div id="inspecting-the-simulation-output" class="section level2">
 <h2 class="hasAnchor">
 <a href="#inspecting-the-simulation-output" class="anchor"></a>Inspecting the simulation output</h2>
-<p>The greatest advantage of this package is its ability to extract and modify information directly from/to the gadget’s internal runtime objects in memory. This will save user from tinkering with the gadget model configuration files and also it output printing files.</p>
-<p>This guide won’t cover the on-the-fly modification of a gagdet internal objects. However, the code below should demonstrates the package ability on gadget information extraction.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"><span class="co"># Print out all status</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]))
+<p>The greatest advantage of this package is its ability to extract and modify information directly from/to the gadget’s internal runtime objects in memory. This will save users from tinkering with the gadget model configuration files and also it output printing files.</p>
+<p>This guide won’t cover the on-the-fly modification of a gagdet internal objects. However, the code below should demonstrates the package’s capability to extract gadget information.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit">
+<span class="co"># Print out all status</span>
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]))
 <span class="co">#&gt; [1] "fleets" "stocks"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">stock</span>))
 <span class="co">#&gt; [1] "had"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">fleet</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">fleet</span>))
 <span class="co">#&gt; [1] "comm"   "survey" "future"</span>
 
 <span class="co"># Print haddock stock in step 1</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>$<span class="no">had</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">stock</span><span class="op">$</span><span class="kw">had</span>))
 <span class="co">#&gt; [1] "stk" "ssb" "rec" "eat"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>$<span class="no">had</span>$<span class="no">stk</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">stock</span><span class="op">$</span><span class="kw">had</span><span class="op">$</span><span class="kw">stk</span>))
 <span class="co">#&gt;        year step area age length    number meanWeights</span>
 <span class="co">#&gt; [855,] 1978    1    1  10   84.5 2167.5906    5.438262</span>
 <span class="co">#&gt; [856,] 1978    1    1  10   85.5 1641.8743    5.618887</span>
@@ -228,9 +241,9 @@
 <span class="co">#&gt; [860,] 1978    1    1  10   89.5  477.7205    6.379800</span>
 
 <span class="co"># Print haddock recruitment in step 1</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>$<span class="no">had</span>$<span class="no">rec</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">stock</span><span class="op">$</span><span class="kw">had</span><span class="op">$</span><span class="kw">rec</span>))
 <span class="co">#&gt; [1] "renew" "spawn"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>$<span class="no">had</span>$<span class="no">rec</span>$<span class="no">renew</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">stock</span><span class="op">$</span><span class="kw">had</span><span class="op">$</span><span class="kw">rec</span><span class="op">$</span><span class="kw">renew</span>))
 <span class="co">#&gt;       year step area age length renewalNumber renewalWeight</span>
 <span class="co">#&gt; [19,] 1978    1    1   1   22.5  544218.20585     0.1167141</span>
 <span class="co">#&gt; [20,] 1978    1    1   1   23.5  134136.30078     0.1327542</span>
@@ -238,31 +251,34 @@
 <span class="co">#&gt; [22,] 1978    1    1   1   25.5    4505.39788     0.1691329</span>
 <span class="co">#&gt; [23,] 1978    1    1   1   26.5     613.96938     0.1895923</span>
 <span class="co">#&gt; [24,] 1978    1    1   1   27.5      68.67105     0.2116456</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">stock</span>$<span class="no">had</span>$<span class="no">rec</span>$<span class="no">spawn</span>)
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">stock</span><span class="op">$</span><span class="kw">had</span><span class="op">$</span><span class="kw">rec</span><span class="op">$</span><span class="kw">spawn</span>)
 <span class="co">#&gt; &lt;0 x 0 matrix&gt;</span>
 
 <span class="co"># Print haddock catch by commercial fleet in step 1</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">fleet</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">fleet</span>))
 <span class="co">#&gt; [1] "comm"   "survey" "future"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">fleet</span>$<span class="no">comm</span>$<span class="no">catch</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/pkg/FLCore/man/names.html">names</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">fleet</span><span class="op">$</span><span class="kw">comm</span><span class="op">$</span><span class="kw">catch</span>))
 <span class="co">#&gt; [1] "had"</span>
-<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="no">stats</span><span class="kw">[[</span><span class="fl">1</span>]]$<span class="no">fleet</span>$<span class="no">comm</span>$<span class="no">catch</span>$<span class="no">had</span>))
+<span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span>(<span class="kw">stats</span>[[<span class="fl">1</span>]]<span class="op">$</span><span class="kw">fleet</span><span class="op">$</span><span class="kw">comm</span><span class="op">$</span><span class="kw">catch</span><span class="op">$</span><span class="kw">had</span>))
 <span class="co">#&gt;        year step area age length numberConsumed biomassConsumed mortality</span>
 <span class="co">#&gt; [425,] 1978    1    1  10   78.5      943.42925       4248.9201 0.2418700</span>
 <span class="co">#&gt; [426,] 1978    1    1  10   80.5      613.50613       2961.1357 0.2419795</span>
 <span class="co">#&gt; [427,] 1978    1    1  10   82.5      379.73514       1960.9355 0.2420509</span>
 <span class="co">#&gt; [428,] 1978    1    1  10   84.5      223.72674       1234.1016 0.2420975</span>
 <span class="co">#&gt; [429,] 1978    1    1  10   86.5      125.47149        738.1895 0.2421279</span>
-<span class="co">#&gt; [430,] 1978    1    1  10   88.5       66.98412        419.7142 0.2421477</span></pre></body></html></div>
+<span class="co">#&gt; [430,] 1978    1    1  10   88.5       66.98412        419.7142 0.2421477</span>
+</pre></div>
 </div>
 <div id="terminating-the-model-run" class="section level2">
 <h2 class="hasAnchor">
 <a href="#terminating-the-model-run" class="anchor"></a>Terminating the model run</h2>
-<p>After each simulation, it is necessary for user to properly terminate an active gadget simulation run. Use the code below after you finished with a simulation run or if you want to restart the current model or loading a new model.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="co"># Sim cleanup</span>
-<span class="kw pkg">gadgetr</span><span class="kw ns">::</span><span class="fu"><a href="../reference/endGadget.html">endGadget</a></span>()
+<p>After each simulation, it is necessary for users to properly terminate an active gadget simulation run. Use the code below when you finish with a simulation run or if you want to restart the current model or loading a new model.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit">
+<span class="co"># Sim cleanup</span>
+<span class="kw">gadgetr</span>::<span class="fu"><a href="../reference/endGadget.html">endGadget</a></span>()
 <span class="co">#&gt; [1] "Gadget succesfully terminates."</span>
-<span class="co">#&gt; NULL</span></pre></body></html></div>
+<span class="co">#&gt; NULL</span>
+</pre></div>
 <p>The <code><a href="../reference/endGadget.html">endGadget()</a></code> function will remove all gadget internal runtime objects from memory and ensure gadget library is ready to start another simulation run.</p>
 </div>
 </div>
@@ -283,7 +299,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
